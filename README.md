@@ -100,3 +100,7 @@ Per il primo accesso non esistono credenziali preimpostate: crea un utente Auth 
 - Schede SEO con titolo, descrizione, canonical, Open Graph e dati strutturati quando disponibili.
 - Richiesta di valutazione, contatto e avvisi email basati sulle preferenze di ricerca.
 - Backoffice con autenticazione username/password e CRUD protetto da Row Level Security.
+
+## Sistema grafico Material UI
+
+Il tema globale si trova in `src/theme.ts` ed è applicato nell'entry point `src/main.tsx` tramite `ThemeProvider` e `CssBaseline`. La palette mantiene il verde Casadibari e la tipografia Roboto. Componenti Material UI sono utilizzati per pulsanti, card e badge degli immobili, barra di ricerca, controlli di navigazione, carosello, campi login, feedback/alert e azioni del backoffice. Gli stili condivisi e responsive sono in `src/index.css`.
