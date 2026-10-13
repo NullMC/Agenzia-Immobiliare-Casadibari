@@ -6,7 +6,7 @@ import Seo from '../components/Seo';
 import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { demoProperties, type Property, type SearchFilters } from '../types';
+import { type Property, type SearchFilters } from '../types';
 
 const defaultFilters: SearchFilters = { q: '', transaction: '', propertyType: '', minPrice: '', maxPrice: '' };
 const readFilters = (search: string): SearchFilters => {
@@ -22,7 +22,7 @@ const readFilters = (search: string): SearchFilters => {
 
 export default function PropertiesPage() {
   const location = useLocation();
-  const [properties, setProperties] = useState<Property[]>(isSupabaseConfigured ? [] : demoProperties);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [email, setEmail] = useState('');
   const [consent, setConsent] = useState(false);
@@ -84,8 +84,7 @@ export default function PropertiesPage() {
       <section className="container listings-page">
         <div className="listings-search"><SearchBar compact key={location.search} initialFilters={filters} /></div>
         <div className="listings-title-row"><div><span className="eyebrow">Annunci immobiliari</span><h2>{filtered.length} {filtered.length === 1 ? 'proposta' : 'proposte'} {filters.q ? 'per “' + filters.q + '”' : 'per te'}</h2></div><p><Search size={16} /> Ordinate per pertinenza e selezione dell’agenzia</p></div>
-        {loading ? <div className="loading-state">Caricamento annunci…</div> : filtered.length ? <div className="property-grid">{filtered.map(property => <PropertyCard key={property.id} property={property} demo={!isSupabaseConfigured} />)}</div> : <div className="empty-state"><House size={34} /><h3>Nessun immobile trovato</h3><p>Prova a modificare i filtri oppure salva la ricerca: potremo avvisarti quando ci sarà una proposta adatta.</p><Button component="a" href="/immobili" variant="text" color="primary">Rimuovi i filtri →</Button></div>}
-        {!isSupabaseConfigured && <p className="demo-note">Anteprima grafica: le schede con l’etichetta “Esempio” sono contenuti dimostrativi e non immobili in vendita.</p>}
+        {loading ? <div className="loading-state">Caricamento annunci…</div> : filtered.length ? <div className="property-grid">{filtered.map(property => <PropertyCard key={property.id} property={property} demo={!isSupabaseConfigured} />)}</div> : <div className="empty-state"><House size={34} /><h3>Nessun immobile disponibile</h3><p>Non ci sono annunci che corrispondono ai criteri selezionati. Prova a modificare i filtri oppure salva la ricerca per ricevere aggiornamenti sulle nuove disponibilità.</p><Button component="a" href="/immobili" variant="text" color="primary">Rimuovi i filtri →</Button></div>}
       </section>
       <section className="alert-section"><div className="container alert-section__inner"><div className="alert-section__copy"><span className="alert-section__icon"><BellRing size={23} /></span><span className="eyebrow">Rimani aggiornato</span><h2>La prossima casa potrebbe arrivare domani.</h2><p>Salva le tue preferenze: quando una nuova disponibilità corrisponde alla ricerca, riceverai un’email con fino a tre proposte pertinenti.</p><ul><li><CheckCircle2 size={16} /> Annunci selezionati in base ai tuoi criteri</li><li><CheckCircle2 size={16} /> Massimo tre proposte per email</li><li><CheckCircle2 size={16} /> Nessun obbligo di acquisto</li></ul></div>
           <form className="alert-form" onSubmit={subscribe}><h3>Salva la tua ricerca</h3><TextField className="alert-email-field" label="La tua email" type="email" autoComplete="email" required size="small" value={email} onChange={event => setEmail(event.target.value)} placeholder="nome@email.it" /><div className="alert-form__summary"><span>Operazione</span><strong>{filters.transaction || 'Vendita e affitto'}</strong><span>Zona</span><strong>{filters.q || 'Bari e dintorni'}</strong><span>Tipologia</span><strong>{filters.propertyType || 'Tutte'}</strong><span>Budget</span><strong>{filters.minPrice || filters.maxPrice ? (filters.minPrice ? 'da ' + Number(filters.minPrice).toLocaleString('it-IT') + ' € ' : '') + (filters.maxPrice ? 'a ' + Number(filters.maxPrice).toLocaleString('it-IT') + ' €' : '') : 'Da definire'}</strong></div><label className="check-field"><input type="checkbox" checked={consent} onChange={event => setConsent(event.target.checked)} /><span>Acconsento al trattamento dei dati per ricevere gli avvisi immobiliari e dichiaro di aver letto l’informativa privacy.</span></label><Button variant="contained" fullWidth type="submit" disabled={sending} endIcon={<BellRing size={17} />}>{sending ? 'Salvataggio…' : 'Attiva gli avvisi email'}</Button>{alertMessage && <p className="form-feedback" role="status">{alertMessage}</p>}<small>Potrai chiedere la cancellazione degli avvisi contattando l’agenzia.</small></form>
