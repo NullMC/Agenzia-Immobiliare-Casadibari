@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Button } from '@mui/material';
 import { ArrowRight, BadgeCheck, Home, KeyRound, MessageCircle, ShieldCheck, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
@@ -63,7 +64,7 @@ export default function HomePage() {
             <span className="eyebrow eyebrow--light"><span className="eyebrow__dot" /> {activeSlide.eyebrow}</span>
             <h1>{activeSlide.title.split('\n').map((line, index) => <span key={line}>{line}{index === 0 && <br />}</span>)}</h1>
             <p>Il tuo Partner di fiducia nel mondo immobiliare. Dal 2001, esperienza e attenzione per accompagnarti a casa.</p>
-            <div className="hero__actions"><Link className="button button--primary button--large" to="/immobili">Scopri gli immobili <ArrowRight size={18} /></Link><Link className="hero__secondary-link" to="/valutazione">Valuta la tua casa gratuitamente</Link></div>
+            <div className="hero__actions"><Button component={Link} to="/immobili" variant="contained" size="large" endIcon={<ArrowRight size={18} />}>Scopri gli immobili</Button><Link className="hero__secondary-link" to="/valutazione">Valuta la tua casa gratuitamente</Link></div>
           </div>
           <div className="hero__pagination" aria-label="Seleziona immagine principale">
             {heroSlides.map((item, index) => <button type="button" key={item.image} className={index === slide ? 'is-active' : ''} onClick={() => setSlide(index)} aria-label={'Mostra immagine ' + (index + 1)} />)}
@@ -75,8 +76,8 @@ export default function HomePage() {
 
       <section className="section section--featured">
         <div className="container">
-          <div className="section-heading"><div><span className="eyebrow">Una selezione per te</span><h2>Le nostre <span>proposte in evidenza</span></h2><p>Immobili selezionati per aiutarti a trovare lo spazio giusto per i tuoi progetti.</p></div><Link className="button button--outline" to="/immobili">Tutti gli immobili <ArrowRight size={17} /></Link></div>
-          {properties.length ? <div className="property-grid">{properties.map(property => <PropertyCard key={property.id} property={property} demo={!isSupabaseConfigured} />)}</div> : <div className="empty-state"><Home size={32} /><h3>Stiamo preparando nuove proposte</h3><p>Contattaci per raccontarci cosa stai cercando: ti aiuteremo a trovare la soluzione adatta.</p><Link className="button button--primary" to="/contatti">Parla con noi</Link></div>}
+          <div className="section-heading"><div><span className="eyebrow">Una selezione per te</span><h2>Le nostre <span>proposte in evidenza</span></h2><p>Immobili selezionati per aiutarti a trovare lo spazio giusto per i tuoi progetti.</p></div><Button component={Link} to="/immobili" variant="outlined" color="primary" endIcon={<ArrowRight size={17} />}>Tutti gli immobili</Button></div>
+          {properties.length ? <div className="property-grid">{properties.map(property => <PropertyCard key={property.id} property={property} demo={!isSupabaseConfigured} />)}</div> : <div className="empty-state"><Home size={32} /><h3>Stiamo preparando nuove proposte</h3><p>Contattaci per raccontarci cosa stai cercando: ti aiuteremo a trovare la soluzione adatta.</p><Button component={Link} to="/contatti" variant="contained">Parla con noi</Button></div>}
           {!isSupabaseConfigured && <p className="demo-note">Anteprima grafica: le schede contrassegnate “Esempio” sono contenuti dimostrativi.</p>}
         </div>
       </section>
@@ -99,12 +100,12 @@ export default function HomePage() {
       </section>
 
       <section className="review-section section">
-        <div className="container review-section__inner"><div className="review-intro"><span className="eyebrow eyebrow--light">La fiducia, prima di tutto</span><h2>Le relazioni sono il nostro risultato più importante.</h2><p>Il percorso immobiliare si costruisce con ascolto, chiarezza e cura. Ogni esperienza condivisa ci aiuta a fare meglio.</p><Link className="button button--light" to="/chi-siamo#recensioni">Scopri chi siamo <ArrowRight size={16} /></Link></div>
+        <div className="container review-section__inner"><div className="review-intro"><span className="eyebrow eyebrow--light">La fiducia, prima di tutto</span><h2>Le relazioni sono il nostro risultato più importante.</h2><p>Il percorso immobiliare si costruisce con ascolto, chiarezza e cura. Ogni esperienza condivisa ci aiuta a fare meglio.</p><Button component={Link} to="/chi-siamo#recensioni" variant="outlined" color="secondary" endIcon={<ArrowRight size={16} />}>Scopri chi siamo</Button></div>
           <div className="review-cards">{reviews.length ? reviews.map(review => <article className="review-card" key={review.id}><div className="review-stars" aria-label={review.rating + ' su 5 stelle'}>{Array.from({ length: review.rating }).map((_, i) => <Star size={15} fill="currentColor" key={i} />)}</div><p>“{review.content}”</p><strong>{review.author_name}</strong>{review.source && <small>{review.source}</small>}</article>) : <article className="review-card review-card--empty"><MessageCircle size={26} /><strong>Il tuo parere conta.</strong><p>Il nostro obiettivo è costruire un rapporto di fiducia in ogni fase del percorso.</p><Link to="/contatti">Scrivici per raccontarci la tua esperienza →</Link></article>}</div>
         </div>
       </section>
 
-      <section className="closing-cta"><div className="container closing-cta__inner"><div><span className="eyebrow">Parliamone insieme</span><h2>Il prossimo passo può cominciare da qui.</h2><p>Raccontaci di cosa hai bisogno: siamo qui per ascoltarti.</p></div><div className="closing-cta__actions"><Link className="button button--primary button--large" to="/contatti">Contattaci <ArrowRight size={18} /></Link><Link className="button button--outline button--large" to="/valutazione">Valuta il tuo immobile</Link></div></div></section>
+      <section className="closing-cta"><div className="container closing-cta__inner"><div><span className="eyebrow">Parliamone insieme</span><h2>Il prossimo passo può cominciare da qui.</h2><p>Raccontaci di cosa hai bisogno: siamo qui per ascoltarti.</p></div><div className="closing-cta__actions"><Button component={Link} to="/contatti" variant="contained" size="large" endIcon={<ArrowRight size={18} />}>Contattaci</Button><Button component={Link} to="/valutazione" variant="outlined" size="large">Valuta il tuo immobile</Button></div></div></section>
     </>
   );
 }
