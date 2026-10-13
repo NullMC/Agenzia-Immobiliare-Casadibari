@@ -1,4 +1,5 @@
 import { BedDouble, Bath, Maximize2, MapPin, ArrowUpRight } from 'lucide-react';
+import { Card, Chip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import type { Property } from '../types';
 
@@ -8,13 +9,13 @@ export default function PropertyCard({ property, demo = false }: { property: Pro
   const photo = property.property_images?.slice().sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))[0];
   const status = property.status === 'under_offer' ? 'In trattativa' : property.status === 'sold' ? 'Venduto' : property.status === 'rented' ? 'Locato' : null;
   return (
-    <article className="property-card">
+    <Card component="article" className="property-card" elevation={0}>
       <Link className="property-card__image-link" to={'/immobile/' + property.slug} aria-label={'Apri: ' + property.title}>
         <img className="property-card__image" src={photo?.public_url || '/casadibari-logo.svg'} alt={photo?.alt_text || property.title} loading="lazy" />
         <div className="property-card__badges">
-          {property.featured && <span className="badge badge--green">In evidenza</span>}
-          {status && <span className="badge badge--light">{status}</span>}
-          {demo && <span className="badge badge--demo">Esempio</span>}
+          {property.featured && <Chip label="In evidenza" size="small" color="success" className="property-chip property-chip--featured" />}
+          {status && <Chip label={status} size="small" className="property-chip" />}
+          {demo && <Chip label="Esempio" size="small" className="property-chip property-chip--demo" />}
         </div>
         <span className="property-card__open"><ArrowUpRight size={18} /></span>
       </Link>
@@ -33,6 +34,6 @@ export default function PropertyCard({ property, demo = false }: { property: Pro
           <Link className="text-link" to={'/immobile/' + property.slug}>Scopri di più <span aria-hidden="true">→</span></Link>
         </div>
       </div>
-    </article>
+    </Card>
   );
 }
