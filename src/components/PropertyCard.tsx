@@ -5,17 +5,16 @@ import type { Property } from '../types';
 
 const money = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-export default function PropertyCard({ property, demo = false }: { property: Property; demo?: boolean }) {
+export default function PropertyCard({ property }: { property: Property }) {
   const photo = property.property_images?.slice().sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))[0];
   const status = property.status === 'under_offer' ? 'In trattativa' : property.status === 'sold' ? 'Venduto' : property.status === 'rented' ? 'Locato' : null;
   return (
     <Card component="article" className="property-card" elevation={0}>
       <Link className="property-card__image-link" to={'/immobile/' + property.slug} aria-label={'Apri: ' + property.title}>
-        <img className="property-card__image" src={photo?.public_url || '/Logo%20Agenzia%20Casadibari.webp'} alt={photo?.alt_text || property.title} loading="lazy" />
+        <img className="property-card__image" src={photo?.public_url || '/casadibari-logo.svg'} alt={photo?.alt_text || property.title} loading="lazy" />
         <div className="property-card__badges">
           {property.featured && <Chip label="In evidenza" size="small" color="success" className="property-chip property-chip--featured" />}
           {status && <Chip label={status} size="small" className="property-chip" />}
-          {demo && <Chip label="Esempio" size="small" className="property-chip property-chip--demo" />}
         </div>
         <span className="property-card__open"><ArrowUpRight size={18} /></span>
       </Link>
