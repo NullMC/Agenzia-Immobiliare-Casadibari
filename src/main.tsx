@@ -6,7 +6,6 @@ import { CssBaseline, ThemeProvider } from '@mui/material';
 import App from './App';
 import AppErrorBoundary from './components/AppErrorBoundary';
 import { casadibariTheme } from './theme';
-import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
