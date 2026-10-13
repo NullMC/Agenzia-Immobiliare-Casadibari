@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Bath, BedDouble, Check, ChevronLeft, ChevronRight, HeartHandshake, MapPin, Maximize2, Phone } from 'lucide-react';
 import Seo from '../components/Seo';
 import DOMPurify from 'dompurify';
+import { IconButton } from '@mui/material';
 import PropertyCard from '../components/PropertyCard';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { demoProperties, type Property } from '../types';
@@ -54,7 +55,7 @@ export default function PropertyPage() {
         <div className="breadcrumbs"><Link to="/">Home</Link><span>/</span><Link to="/immobili">Immobili</Link><span>/</span><span>{property.title}</span></div>
         <div className="property-detail__headline"><div><span className="eyebrow">{property.transaction_type} · {property.property_type}</span><h1>{property.title}</h1><p><MapPin size={17} /> {property.address || property.neighborhood || property.city}{property.city ? ', ' + property.city : ''}</p></div><div className="property-detail__price"><span className={'badge ' + (property.status === 'available' ? 'badge--green' : 'badge--light')}>{statusLabel}</span><strong>{property.price != null ? money.format(property.price) : 'Prezzo su richiesta'}</strong></div></div>
         <div className="property-detail__gallery">
-          <div className="property-gallery__main"><img src={images[photoIndex]?.public_url || '/casadibari-logo.svg'} alt={images[photoIndex]?.alt_text || property.title} />{images.length > 1 && <><button className="gallery-arrow gallery-arrow--left" type="button" onClick={() => nextPhoto(-1)} aria-label="Foto precedente"><ChevronLeft size={24} /></button><button className="gallery-arrow gallery-arrow--right" type="button" onClick={() => nextPhoto(1)} aria-label="Foto successiva"><ChevronRight size={24} /></button><div className="gallery-counter">{photoIndex + 1} / {images.length}</div></>}</div>
+          <div className="property-gallery__main"><img src={images[photoIndex]?.public_url || '/casadibari-logo.svg'} alt={images[photoIndex]?.alt_text || property.title} />{images.length > 1 && <><IconButton className="gallery-arrow gallery-arrow--left" type="button" onClick={() => nextPhoto(-1)} aria-label="Foto precedente"><ChevronLeft size={24} /></IconButton><IconButton className="gallery-arrow gallery-arrow--right" type="button" onClick={() => nextPhoto(1)} aria-label="Foto successiva"><ChevronRight size={24} /></IconButton><div className="gallery-counter">{photoIndex + 1} / {images.length}</div></>}</div>
           {images.length > 1 && <div className="property-gallery__thumbs">{images.map((image, index) => <button type="button" key={image.id || image.public_url} onClick={() => setPhotoIndex(index)} className={index === photoIndex ? 'is-active' : ''} aria-label={'Mostra foto ' + (index + 1)}><img src={image.public_url} alt={image.alt_text || property.title} loading="lazy" /></button>)}</div>}
         </div>
         <div className="property-detail__layout">
