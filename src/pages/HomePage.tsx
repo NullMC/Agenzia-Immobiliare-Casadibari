@@ -6,7 +6,7 @@ import Seo from '../components/Seo';
 import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { demoProperties, type Property, type Review } from '../types';
+import { type Property, type Review } from '../types';
 
 const heroSlides = [
   { image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2200&q=90', eyebrow: 'La casa dei tuoi progetti', title: 'Il posto giusto\nper la tua prossima storia.' },
@@ -16,7 +16,7 @@ const heroSlides = [
 
 export default function HomePage() {
   const [slide, setSlide] = useState(0);
-  const [properties, setProperties] = useState<Property[]>(isSupabaseConfigured ? [] : demoProperties.filter(p => p.featured));
+  const [properties, setProperties] = useState<Property[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
 
   useEffect(() => {
@@ -77,8 +77,7 @@ export default function HomePage() {
       <section className="section section--featured">
         <div className="container">
           <div className="section-heading"><div><span className="eyebrow">Una selezione per te</span><h2>Le nostre <span>proposte in evidenza</span></h2><p>Immobili selezionati per aiutarti a trovare lo spazio giusto per i tuoi progetti.</p></div><Button component={Link} to="/immobili" variant="outlined" color="primary" endIcon={<ArrowRight size={17} />}>Tutti gli immobili</Button></div>
-          {properties.length ? <div className="property-grid">{properties.map(property => <PropertyCard key={property.id} property={property} demo={!isSupabaseConfigured} />)}</div> : <div className="empty-state"><Home size={32} /><h3>Stiamo preparando nuove proposte</h3><p>Contattaci per raccontarci cosa stai cercando: ti aiuteremo a trovare la soluzione adatta.</p><Button component={Link} to="/contatti" variant="contained">Parla con noi</Button></div>}
-          {!isSupabaseConfigured && <p className="demo-note">Anteprima grafica: le schede contrassegnate “Esempio” sono contenuti dimostrativi.</p>}
+          {properties.length ? <div className="property-grid">{properties.map(property => <PropertyCard key={property.id} property={property} />)}</div> : <div className="empty-state"><Home size={32} /><h3>Stiamo preparando nuove proposte</h3><p>Contattaci per raccontarci cosa stai cercando: ti aiuteremo a trovare la soluzione adatta.</p><Button component={Link} to="/contatti" variant="contained">Parla con noi</Button></div>}
         </div>
       </section>
 
