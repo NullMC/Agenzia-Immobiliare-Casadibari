@@ -6,13 +6,13 @@ import DOMPurify from 'dompurify';
 import { IconButton } from '@mui/material';
 import PropertyCard from '../components/PropertyCard';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { demoProperties, type Property } from '../types';
+import { type Property } from '../types';
 
 const money = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
 export default function PropertyPage() {
   const { slug } = useParams();
-  const [property, setProperty] = useState<Property | null>(isSupabaseConfigured ? null : demoProperties.find(item => item.slug === slug) || null);
+  const [property, setProperty] = useState<Property | null>(null);
   const [related, setRelated] = useState<Property[]>([]);
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [photoIndex, setPhotoIndex] = useState(0);
@@ -20,7 +20,7 @@ export default function PropertyPage() {
   useEffect(() => {
     setPhotoIndex(0);
     if (!isSupabaseConfigured) {
-      setProperty(demoProperties.find(item => item.slug === slug) || null);
+      setProperty(null);
       setLoading(false);
       return;
     }
@@ -55,7 +55,7 @@ export default function PropertyPage() {
         <div className="breadcrumbs"><Link to="/">Home</Link><span>/</span><Link to="/immobili">Immobili</Link><span>/</span><span>{property.title}</span></div>
         <div className="property-detail__headline"><div><span className="eyebrow">{property.transaction_type} · {property.property_type}</span><h1>{property.title}</h1><p><MapPin size={17} /> {property.address || property.neighborhood || property.city}{property.city ? ', ' + property.city : ''}</p></div><div className="property-detail__price"><span className={'badge ' + (property.status === 'available' ? 'badge--green' : 'badge--light')}>{statusLabel}</span><strong>{property.price != null ? money.format(property.price) : 'Prezzo su richiesta'}</strong></div></div>
         <div className="property-detail__gallery">
-          <div className="property-gallery__main"><img src={images[photoIndex]?.public_url || '/Logo%20Agenzia%20Casadibari.webp'} alt={images[photoIndex]?.alt_text || property.title} />{images.length > 1 && <><IconButton className="gallery-arrow gallery-arrow--left" type="button" onClick={() => nextPhoto(-1)} aria-label="Foto precedente"><ChevronLeft size={24} /></IconButton><IconButton className="gallery-arrow gallery-arrow--right" type="button" onClick={() => nextPhoto(1)} aria-label="Foto successiva"><ChevronRight size={24} /></IconButton><div className="gallery-counter">{photoIndex + 1} / {images.length}</div></>}</div>
+          <div className="property-gallery__main"><img src={images[photoIndex]?.public_url || '/casadibari-logo.svg'} alt={images[photoIndex]?.alt_text || property.title} />{images.length > 1 && <><IconButton className="gallery-arrow gallery-arrow--left" type="button" onClick={() => nextPhoto(-1)} aria-label="Foto precedente"><ChevronLeft size={24} /></IconButton><IconButton className="gallery-arrow gallery-arrow--right" type="button" onClick={() => nextPhoto(1)} aria-label="Foto successiva"><ChevronRight size={24} /></IconButton><div className="gallery-counter">{photoIndex + 1} / {images.length}</div></>}</div>
           {images.length > 1 && <div className="property-gallery__thumbs">{images.map((image, index) => <button type="button" key={image.id || image.public_url} onClick={() => setPhotoIndex(index)} className={index === photoIndex ? 'is-active' : ''} aria-label={'Mostra foto ' + (index + 1)}><img src={image.public_url} alt={image.alt_text || property.title} loading="lazy" /></button>)}</div>}
         </div>
         <div className="property-detail__layout">
@@ -74,7 +74,6 @@ export default function PropertyPage() {
           <aside className="property-contact-card"><span className="eyebrow">Ti interessa?</span><h2>Vieni a vedere se è casa tua.</h2><p>Contattaci per ricevere maggiori informazioni o fissare una visita.</p><a className="button button--primary button--full" href="tel:+390808491745"><Phone size={17} /> 080 849 1745</a><Link className="button button--outline button--full" to="/contatti">Invia una richiesta <ArrowRight size={17} /></Link><div className="property-contact-card__note"><Check size={15} /> Consulenza dedicata, senza impegno</div></aside>
         </div>
         {related.length > 0 && <section className="related-properties"><div className="section-heading"><div><span className="eyebrow">Potrebbero interessarti</span><h2>Altre proposte simili</h2></div><Link className="text-link" to="/immobili">Vedi tutti <ArrowRight size={16} /></Link></div><div className="property-grid">{related.map(item => <PropertyCard key={item.id} property={item} />)}</div></section>}
-        {!isSupabaseConfigured && <p className="demo-note">Scheda dimostrativa: collega Supabase per mostrare solo annunci reali pubblicati dall’agenzia.</p>}
       </div>
     </>
   );
