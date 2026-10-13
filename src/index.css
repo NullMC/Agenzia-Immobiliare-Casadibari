@@ -794,3 +794,9 @@ h1, h2, h3, h4 { margin-top: 0; color: var(--ink); line-height: 1.15; }
   .gallery-arrow--left.MuiIconButton-root { left: 10px; }
   .gallery-arrow--right.MuiIconButton-root { right: 10px; }
 }
+
+/* Higher-specificity selectors keep Material UI controls aligned with the responsive layout. */
+.mobile-menu-toggle.MuiIconButton-root { display: none; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 9px; color: var(--brand-dark); background: #edf7ef; }
+@media (max-width: 900px) {
+  .mobile-menu-toggle.MuiIconButton-root { display: inline-flex; margin-left: auto; }
+}
