@@ -164,7 +164,9 @@ h1, h2, h3, h4 { margin-top: 0; color: var(--ink); line-height: 1.15; }
 .story-stamp { position: absolute; z-index: 2; left: -13px; bottom: 15px; display: flex; flex-direction: column; gap: 4px; padding: 19px 24px; background: #fff; border-radius: 12px; box-shadow: var(--shadow-card); }
 .story-stamp strong { color: var(--brand-dark); font-size: 26px; }
 .story-stamp span { color: var(--muted); font-size: 11px; }
-.story-copy h2 { margin: 12px 0 20px; max-width: 560px; font-size: clamp(30px, 3.2vw, 43px); letter-spacing: -.045em; }
+.story-copy h2 { margin: 12px 0 20px; max-width: 640px; font-size: clamp(30px, 3.2vw, 43px); letter-spacing: -.045em; }
+.story-copy__highlight { display: inline-block; margin-top: 4px; font-size: 1.04em; font-family: Georgia, "Times New Roman", serif; font-style: italic; white-space: nowrap; }
+.story-copy__highlight-home { display: inline-block; font-family: Georgia, "Times New Roman", serif; font-style: italic; }
 .story-copy > p { margin: 0 0 13px; color: #627066; font-size: 14px; }
 .story-copy > .text-link { margin-top: 8px; }
 .story-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 34px; padding-top: 25px; border-top: 1px solid #dce6dc; }
@@ -183,7 +185,8 @@ h1, h2, h3, h4 { margin-top: 0; color: var(--ink); line-height: 1.15; }
 .review-section__inner { display: grid; grid-template-columns: .9fr 1.1fr; gap: 60px; align-items: center; }
 .review-intro h2 { margin: 13px 0; color: #fff; font-size: clamp(30px,3.2vw,42px); letter-spacing: -.04em; }
 .review-intro p { color: rgba(255,255,255,.73); font-size: 14px; }
-.review-intro .button { margin-top: 14px; }
+.review-intro .button { margin-top: 14px; border-color: #fff; color: #173923; background: #fff; box-shadow: none; }
+.review-intro .button:hover { background: #f3f8f3; border-color: #fff; color: #173923; }
 .review-cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
 .review-card { padding: 22px; border-radius: 14px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.13); }
 .review-card p { margin: 14px 0 20px; color: rgba(255,255,255,.86); font-size: 13px; line-height: 1.7; }

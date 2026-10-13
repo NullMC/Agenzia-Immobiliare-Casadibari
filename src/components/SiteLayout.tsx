@@ -38,10 +38,10 @@ export default function SiteLayout() {
 
   return (
     <div className="app-shell">
-      <div className="top-strip"><div className="container top-strip__inner"><span><MapPin size={13} /> Bari, Puglia · Dal 2001 al tuo fianco</span><div className="top-strip__contacts">{contact.phone && <a href={tel}><Phone size={13} /> {contact.phone}</a>}{contact.email && <a href={'mailto:' + contact.email}><Mail size={13} /> {contact.email}</a>}</div></div></div>
+      <div className="top-strip"><div className="container top-strip__inner"><span><MapPin size={13} /> Bari, Puglia</span><div className="top-strip__contacts">{contact.phone && <a href={tel}><Phone size={13} /> {contact.phone}</a>}{contact.email && <a href={'mailto:' + contact.email}><Mail size={13} /> {contact.email}</a>}</div></div></div>
       <header className="site-header">
         <div className="container site-header__inner">
-          <Link className="brand" to="/" onClick={closeMenu} aria-label="Casadibari Immobiliare, homepage"><img src="/Logo%20Agenzia%20Casadibari.webp" alt="Casadibari Agenzia Immobiliare" /><span className="brand__tagline">La tua casa, la nostra esperienza.</span></Link>
+          <Link className="brand" to="/" onClick={closeMenu} aria-label="Casadibari Immobiliare, homepage"><img src="/Logo%20Agenzia%20Casadibari.webp" alt="Casadibari Agenzia Immobiliare" /></Link>
           <IconButton className="mobile-menu-toggle" color="primary" type="button" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? 'Chiudi menu' : 'Apri menu'} aria-expanded={menuOpen}>{menuOpen ? <X size={24} /> : <Menu size={24} />}</IconButton>
           <nav className={'main-nav' + (menuOpen ? ' main-nav--open' : '')} aria-label="Navigazione principale">
             {navItems.map(item => <NavLink key={item.to} to={item.to} end={'end' in item ? item.end : false} onClick={closeMenu} className={({ isActive }) => 'main-nav__link' + (isActive ? ' is-active' : '')}>{item.label}</NavLink>)}
