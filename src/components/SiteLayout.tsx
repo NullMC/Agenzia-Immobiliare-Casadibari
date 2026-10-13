@@ -41,7 +41,7 @@ export default function SiteLayout() {
       <div className="top-strip"><div className="container top-strip__inner"><span><MapPin size={13} /> Bari, Puglia · Dal 2001 al tuo fianco</span><div className="top-strip__contacts">{contact.phone && <a href={tel}><Phone size={13} /> {contact.phone}</a>}{contact.email && <a href={'mailto:' + contact.email}><Mail size={13} /> {contact.email}</a>}</div></div></div>
       <header className="site-header">
         <div className="container site-header__inner">
-          <Link className="brand" to="/" onClick={closeMenu} aria-label="Casadibari Immobiliare, homepage"><img src="/casadibari-logo.svg" alt="Casadibari Agenzia Immobiliare" /><span className="brand__tagline">La tua casa, la nostra esperienza.</span></Link>
+          <Link className="brand" to="/" onClick={closeMenu} aria-label="Casadibari Immobiliare, homepage"><img src="/Logo%20Agenzia%20Casadibari.webp" alt="Casadibari Agenzia Immobiliare" /><span className="brand__tagline">La tua casa, la nostra esperienza.</span></Link>
           <IconButton className="mobile-menu-toggle" color="primary" type="button" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? 'Chiudi menu' : 'Apri menu'} aria-expanded={menuOpen}>{menuOpen ? <X size={24} /> : <Menu size={24} />}</IconButton>
           <nav className={'main-nav' + (menuOpen ? ' main-nav--open' : '')} aria-label="Navigazione principale">
             {navItems.map(item => <NavLink key={item.to} to={item.to} end={'end' in item ? item.end : false} onClick={closeMenu} className={({ isActive }) => 'main-nav__link' + (isActive ? ' is-active' : '')}>{item.label}</NavLink>)}
@@ -54,7 +54,7 @@ export default function SiteLayout() {
 
       <footer className="site-footer" id="contatti">
         <div className="container footer-main">
-          <div className="footer-brand"><Link to="/" className="footer-logo"><img src="/casadibari-logo.svg" alt="Casadibari Immobiliare" /></Link><p>Il tuo Partner di fiducia nel mondo immobiliare.</p><p className="footer-muted">Dal 2001 ti accompagniamo nelle scelte che contano.</p>
+          <div className="footer-brand"><Link to="/" className="footer-logo"><img src="/Logo%20Agenzia%20Casadibari.webp" alt="Casadibari Immobiliare" /></Link><p>Il tuo Partner di fiducia nel mondo immobiliare.</p><p className="footer-muted">Dal 2001 ti accompagniamo nelle scelte che contano.</p>
             <div className="social-links">{contact.instagram && <a href={contact.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Instagram size={18} /></a>}{contact.facebook && <a href={contact.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook size={18} /></a>}{whatsappNumber && <a href={'https://wa.me/' + whatsappNumber} target="_blank" rel="noreferrer" aria-label="WhatsApp">WA</a>}</div>
           </div>
           <div className="footer-column"><h3>Esplora</h3><Link to="/immobili">Tutti gli immobili</Link><Link to="/valutazione">Valuta casa</Link><Link to="/pubblica-con-noi">Pubblica con noi</Link><Link to="/consulenza-mutui">Mutui e prestiti</Link><Link to="/faq">Domande frequenti</Link></div>

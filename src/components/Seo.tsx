@@ -12,7 +12,7 @@ interface SeoProps {
 
 export default function Seo({ title, description, path, image, noIndex = false, jsonLd }: SeoProps) {
   const canonical = publicSiteUrl() + (path || window.location.pathname);
-  const socialImage = image || publicSiteUrl() + '/casadibari-logo.svg';
+  const socialImage = image || publicSiteUrl() + '/Logo%20Agenzia%20Casadibari.webp';
   return (
     <Helmet>
       <title>{title}</title>

@@ -11,7 +11,7 @@ export default function PropertyCard({ property, demo = false }: { property: Pro
   return (
     <Card component="article" className="property-card" elevation={0}>
       <Link className="property-card__image-link" to={'/immobile/' + property.slug} aria-label={'Apri: ' + property.title}>
-        <img className="property-card__image" src={photo?.public_url || '/casadibari-logo.svg'} alt={photo?.alt_text || property.title} loading="lazy" />
+        <img className="property-card__image" src={photo?.public_url || '/Logo%20Agenzia%20Casadibari.webp'} alt={photo?.alt_text || property.title} loading="lazy" />
         <div className="property-card__badges">
           {property.featured && <Chip label="In evidenza" size="small" color="success" className="property-chip property-chip--featured" />}
           {status && <Chip label={status} size="small" className="property-chip" />}
