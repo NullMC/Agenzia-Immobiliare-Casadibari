@@ -761,3 +761,36 @@ h1, h2, h3, h4 { margin-top: 0; color: var(--ink); line-height: 1.15; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Material UI components used across public pages and the administration workspace */
+.property-card.MuiCard-root { display: block; color: inherit; background: #fff; overflow: hidden; }
+.property-chip.MuiChip-root { height: 25px; border-radius: 6px; font-size: 10px; font-weight: 800; box-shadow: 0 2px 5px rgba(0,0,0,.04); }
+.property-chip .MuiChip-label { padding-inline: 9px; }
+.property-chip--featured.MuiChip-root { background: var(--brand-dark); color: #fff; }
+.property-chip.MuiChip-root:not(.MuiChip-colorSuccess) { background: rgba(255,255,255,.95); color: #34443a; }
+.property-chip--demo.MuiChip-root { background: #fff1c7 !important; color: #75530a !important; }
+.site-header .nav-cta.MuiButton-root { min-height: 40px; padding: 9px 14px; white-space: nowrap; }
+.alert-form .alert-email-field { margin: 0 0 16px; }
+.alert-form .alert-email-field .MuiInputBase-root { background: #fff; }
+.alert-form .MuiButton-root, .form-card > .MuiButton-root, .admin-editor--simple > .MuiButton-root { min-height: 44px; }
+.admin-login-card .admin-login-mui-field { display: block; margin: 0 0 15px; }
+.admin-login-card .MuiButton-root { margin-top: 4px; }
+.admin-mui-alert.MuiAlert-root { margin-bottom: 18px; font-size: 12px; }
+.admin-mui-alert .MuiAlert-message { flex: 1; }
+.admin-mui-alert .MuiAlert-icon { align-items: center; }
+.admin-actions .MuiIconButton-root { width: 33px; height: 33px; padding: 6px; border: 1px solid #e2e9e2; border-radius: 8px; color: #68776a; background: #fff; }
+.admin-actions .MuiIconButton-root:hover { color: var(--brand-dark); border-color: #c4dfc8; background: #eff8f0; }
+.gallery-arrow.MuiIconButton-root { position: absolute; top: 50%; z-index: 2; width: 45px; height: 45px; padding: 0; transform: translateY(-50%); color: #203126; background: rgba(255,255,255,.95); box-shadow: 0 3px 15px rgba(0,0,0,.12); }
+.gallery-arrow.MuiIconButton-root:hover { background: #fff; color: var(--brand-dark); }
+.gallery-arrow--left.MuiIconButton-root { left: 18px; }
+.gallery-arrow--right.MuiIconButton-root { right: 18px; }
+.MuiButton-root { letter-spacing: 0 !important; }
+.MuiButton-startIcon, .MuiButton-endIcon { margin-inline: 0 !important; }
+@media (max-width: 900px) {
+  .site-header .nav-cta.MuiButton-root { width: 100%; min-height: 44px; }
+}
+@media (max-width: 620px) {
+  .gallery-arrow.MuiIconButton-root { width: 38px; height: 38px; }
+  .gallery-arrow--left.MuiIconButton-root { left: 10px; }
+  .gallery-arrow--right.MuiIconButton-root { right: 10px; }
+}
