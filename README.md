@@ -36,24 +36,47 @@ Imposta le variabili Vite in locale e nell'hosting:
 
 La chiave anon è destinata al client e resta protetta dalle policy RLS. La service role key è esclusivamente server-side.
 
-## Edge Functions
+## Edge Functions: deploy e attivazione
 
-Installa/aggiorna Supabase CLI e collega il progetto. Distribuisci entrambe le funzioni:
+Le chiavi `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` configurano il front-end, ma **non distribuiscono le Edge Functions**.
 
-```sh
-supabase functions deploy admin-login
-supabase functions deploy notify-property-alerts
+Apri un terminale nella cartella del repository, autentica la Supabase CLI, identifica il progetto e collegalo:
+
+```powershell
+npx supabase login
+npx supabase projects list
+npx supabase link --project-ref TUO_PROJECT_REF
 ```
 
-Configura nei Function Secrets del progetto:
+Se la migrazione SQL non è stata ancora eseguita, applicala tramite SQL Editor (file `supabase/migrations/202610130001_initial_schema.sql`) oppure, dopo aver collegato il progetto, usa `npx supabase db push`. Se l'hai già eseguita manualmente, non rieseguire alla cieca una seconda procedura di migrazione.
 
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `RESEND_API_KEY` (per l'invio delle email; dominio mittente verificato su Resend)
-- `NOTIFICATION_WEBHOOK_SECRET` (segreto casuale condiviso col webhook)
+Distribuisci le funzioni dal repository:
 
-Per gli avvisi automatici, crea in Supabase Database → Webhooks un webhook sulla tabella `public.property_notification_queue`, evento **INSERT**, destinazione `https://PROJECT_REF.supabase.co/functions/v1/notify-property-alerts`, con header personalizzato `x-hook-secret: VALORE_DI_NOTIFICATION_WEBHOOK_SECRET`. La funzione abbina la nuova disponibilità alle preferenze salvate, prepara fino a tre proposte ancora non inviate per ciascun filtro compatibile e registra gli invii riusciti per evitare duplicazioni. Prima del go-live invia email di prova e controlla i log della funzione.
+```powershell
+npx supabase functions deploy admin-login --use-api
+npx supabase functions deploy notify-property-alerts --use-api
+npx supabase functions list
+```
+
+Le variabili `SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY` sono rese disponibili nell'ambiente delle Edge Functions da Supabase (la chiave service role/secret resta solo server-side): non inserirle nel bundle React e non provare a creare nuovi Function Secrets con prefisso `SUPABASE_`.
+
+Per gli avvisi email, imposta nei **Project Settings → Edge Functions → Secrets** (oppure con `npx supabase secrets set`) questi segreti personalizzati:
+
+- `RESEND_API_KEY`: chiave API Resend.
+- `RESEND_FROM_EMAIL`: mittente email autorizzato/verificato su Resend, ad esempio `Casadibari Immobiliare <immobili@tuodominio.it>`.
+- `SITE_URL`: URL pubblico canonico del sito.
+- `NOTIFICATION_WEBHOOK_SECRET`: stringa casuale lunga, da conservare privata e usare identica nell'header del webhook.
+
+Per completare il login amministratore, crea prima un utente in **Authentication → Users**, poi inserisci il suo UUID, uno username minuscolo e la stessa email in `public.admin_profiles` (vedi query SQL nella sezione precedente).
+
+Per gli avvisi automatici, apri **Database → Webhooks** e crea un webhook:
+- tabella: `public.property_notification_queue`;
+- evento: `INSERT`;
+- URL: `https://TUO_PROJECT_REF.supabase.co/functions/v1/notify-property-alerts`;
+- header personalizzato: `x-hook-secret` con lo stesso valore di `NOTIFICATION_WEBHOOK_SECRET`;
+- metodo: `POST`, con payload JSON del record.
+
+La funzione seleziona fino a tre annunci compatibili per ogni ricerca attiva e usa Resend per inviarli. Pubblica un immobile di test, verifica che venga creata una riga in `property_notification_queue`, poi controlla le consegne del webhook e i log delle Edge Functions. La sola distribuzione delle funzioni non abilita automaticamente le email: servono anche i segreti Resend e il webhook.
 
 ## Contenuti e gestione
 
@@ -77,3 +100,7 @@ Per il primo accesso non esistono credenziali preimpostate: crea un utente Auth 
 - Schede SEO con titolo, descrizione, canonical, Open Graph e dati strutturati quando disponibili.
 - Richiesta di valutazione, contatto e avvisi email basati sulle preferenze di ricerca.
 - Backoffice con autenticazione username/password e CRUD protetto da Row Level Security.
+
+## Sistema grafico Material UI
+
+Il tema globale si trova in `src/theme.ts` ed è applicato nell'entry point `src/main.tsx` tramite `ThemeProvider` e `CssBaseline`. La palette mantiene il verde Casadibari e la tipografia Roboto. Componenti Material UI sono utilizzati per pulsanti, card e badge degli immobili, barra di ricerca, controlli di navigazione, carosello, campi login, feedback/alert e azioni del backoffice. Gli stili condivisi e responsive sono in `src/index.css`.

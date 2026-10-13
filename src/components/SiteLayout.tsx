@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { Facebook, Instagram, Mail, MapPin, Menu, Phone, X } from 'lucide-react';
+import { Button, IconButton } from '@mui/material';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import type { ContactSettings } from '../types';
 
@@ -41,10 +42,10 @@ export default function SiteLayout() {
       <header className="site-header">
         <div className="container site-header__inner">
           <Link className="brand" to="/" onClick={closeMenu} aria-label="Casadibari Immobiliare, homepage"><img src="/casadibari-logo.svg" alt="Casadibari Agenzia Immobiliare" /><span className="brand__tagline">La tua casa, la nostra esperienza.</span></Link>
-          <button className="icon-button mobile-menu-toggle" type="button" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? 'Chiudi menu' : 'Apri menu'} aria-expanded={menuOpen}>{menuOpen ? <X size={24} /> : <Menu size={24} />}</button>
+          <IconButton className="mobile-menu-toggle" color="primary" type="button" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? 'Chiudi menu' : 'Apri menu'} aria-expanded={menuOpen}>{menuOpen ? <X size={24} /> : <Menu size={24} />}</IconButton>
           <nav className={'main-nav' + (menuOpen ? ' main-nav--open' : '')} aria-label="Navigazione principale">
             {navItems.map(item => <NavLink key={item.to} to={item.to} end={'end' in item ? item.end : false} onClick={closeMenu} className={({ isActive }) => 'main-nav__link' + (isActive ? ' is-active' : '')}>{item.label}</NavLink>)}
-            <Link className="button button--primary nav-cta" to="/contatti" onClick={closeMenu}>Parliamone <span aria-hidden="true">↗</span></Link>
+            <Button component={Link} to="/contatti" variant="contained" color="primary" className="nav-cta" onClick={closeMenu}>Parliamone <span aria-hidden="true">↗</span></Button>
           </nav>
         </div>
       </header>
