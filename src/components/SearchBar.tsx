@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import type { SearchFilters } from '../types';
@@ -29,7 +30,7 @@ export default function SearchBar({ compact = false, initialFilters }: { compact
         <label className="field"><span>Tipologia</span><select value={filters.propertyType} onChange={e => update('propertyType', e.target.value)}><option value="">Tutte</option><option>Appartamento</option><option>Villa</option><option>Attico</option><option>Locale commerciale</option><option>Ufficio</option><option>Terreno</option><option>Casa indipendente</option></select></label>
         <label className="field"><span>Prezzo minimo</span><select value={filters.minPrice} onChange={e => update('minPrice', e.target.value)}><option value="">Nessun minimo</option><option value="50000">50.000 €</option><option value="100000">100.000 €</option><option value="150000">150.000 €</option><option value="200000">200.000 €</option><option value="300000">300.000 €</option></select></label>
         <label className="field"><span>Prezzo massimo</span><select value={filters.maxPrice} onChange={e => update('maxPrice', e.target.value)}><option value="">Nessun massimo</option><option value="100000">100.000 €</option><option value="150000">150.000 €</option><option value="200000">200.000 €</option><option value="300000">300.000 €</option><option value="500000">500.000 €</option></select></label>
-        <button className="button button--primary search-panel__submit" type="submit"><Search size={18} /> Cerca immobili</button>
+        <Button className="search-panel__submit" variant="contained" color="primary" type="submit" startIcon={<Search size={18} />}>Cerca immobili</Button>
       </div>
     </form>
   );
