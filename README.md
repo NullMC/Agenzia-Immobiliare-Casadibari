@@ -11,7 +11,7 @@ Requisiti: Node.js 20+ e npm.
 3. Inserisci URL del progetto Supabase e chiave anon/publishable in `.env.local`.
 4. Avvia con `npm run dev`; verifica con `npm run build`.
 
-Senza configurazione Supabase il sito apre una modalità dimostrativa con schede esemplificative. Le schede dimostrative non sono annunci reali e non devono essere utilizzate come disponibilità effettiva. Quando Supabase è configurato, il front-end usa i record pubblicati del database.
+Senza configurazione Supabase il sito non mostra annunci. Le sezioni immobili mostrano uno stato vuoto finché non sono disponibili record reali pubblicati nel database. Non sono incluse schede immobiliari di esempio.
 
 ## Supabase: database e immagini
 
