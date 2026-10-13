@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Bath, BedDouble, Check, ChevronLeft, ChevronRight, HeartHandshake, MapPin, Maximize2, Phone } from 'lucide-react';
 import Seo from '../components/Seo';
+import DOMPurify from 'dompurify';
 import PropertyCard from '../components/PropertyCard';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { demoProperties, type Property } from '../types';
@@ -64,7 +65,7 @@ export default function PropertyPage() {
               {property.floor && <div><span className="fact-icon">⌂</span><span><strong>{property.floor}</strong><small>Piano</small></span></div>}
             </div>
             <h2>Descrizione dell’immobile</h2>
-            <div className="rich-description" dangerouslySetInnerHTML={{ __html: property.description_html || '<p>Per maggiori dettagli su questo immobile, contatta la nostra agenzia.</p>' }} />
+            <div className="rich-description" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(property.description_html || '<p>Per maggiori dettagli su questo immobile, contatta la nostra agenzia.</p>') }} />
             {property.features?.length > 0 && <><h2>Caratteristiche</h2><div className="feature-list">{property.features.map(feature => <span key={feature}><Check size={16} /> {feature}</span>)}</div></>}
             {property.energy_class && <p className="energy-note">Classe energetica: <strong>{property.energy_class}</strong></p>}
             <div className="property-disclaimer"><HeartHandshake size={20} /><p>Vuoi saperne di più o fissare una visita? Ti accompagniamo con chiarezza in ogni fase.</p></div>
