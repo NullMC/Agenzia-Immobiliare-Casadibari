@@ -1,20 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
-import {
-  ArrowRight,
-  BadgeCheck,
-  Home,
-  KeyRound,
-  MessageCircle,
-  ShieldCheck,
-  Star,
-} from 'lucide-react';
+import { ArrowRight, Home, KeyRound, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
 import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
+import ElfsightReviews from '../components/ElfsightReviews';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { demoFaqs, type Faq, type Property, type Review } from '../types';
+import { demoFaqs, type Faq, type Property } from '../types';
 
 const heroSlides = [
   {
@@ -37,7 +30,6 @@ const heroSlides = [
 export default function HomePage() {
   const [slide, setSlide] = useState(0);
   const [properties, setProperties] = useState<Property[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
   const [faqs, setFaqs] = useState<Faq[]>(demoFaqs);
 
   useEffect(() => {
@@ -60,21 +52,14 @@ export default function HomePage() {
         .order('created_at', { ascending: false })
         .limit(3),
       supabase
-        .from('reviews')
-        .select('*')
-        .eq('approved', true)
-        .order('sort_order', { ascending: true })
-        .limit(3),
-      supabase
         .from('faqs')
         .select('*')
         .eq('published', true)
         .order('sort_order', { ascending: true })
         .limit(4),
-    ]).then(([propertyResult, reviewResult, faqResult]) => {
+    ]).then(([propertyResult, faqResult]) => {
       if (!alive) return;
       if (!propertyResult.error) setProperties((propertyResult.data || []) as Property[]);
-      if (!reviewResult.error) setReviews((reviewResult.data || []) as Review[]);
       if (!faqResult.error && faqResult.data?.length) setFaqs(faqResult.data as Faq[]);
     });
     return () => {
@@ -280,44 +265,11 @@ export default function HomePage() {
           <div className="review-intro">
             <span className="eyebrow eyebrow--light">La fiducia, prima di tutto</span>
             <h2>Le relazioni sono il nostro risultato più importante.</h2>
-            <p>
-              Il percorso immobiliare si costruisce con ascolto, chiarezza e cura. Ogni esperienza
-              condivisa ci aiuta a fare meglio.
-            </p>
-            <Button
-              component={Link}
-              to="/chi-siamo#recensioni"
-              variant="outlined"
-              color="primary"
-              endIcon={<ArrowRight size={16} />}
-            >
-              Scopri chi siamo
-            </Button>
+            <p>Il percorso immobiliare si costruisce con ascolto, chiarezza e cura. Scopri le esperienze condivise dai nostri clienti.</p>
+            <Button component={Link} to="/chi-siamo" variant="outlined" color="primary" endIcon={<ArrowRight size={16} />}>Scopri chi siamo</Button>
           </div>
-          <div className="review-cards">
-            {reviews.length ? (
-              reviews.map((review) => (
-                <article className="review-card" key={review.id}>
-                  <div className="review-stars" aria-label={review.rating + ' su 5 stelle'}>
-                    {Array.from({ length: review.rating }).map((_, i) => (
-                      <Star size={15} fill="currentColor" key={i} />
-                    ))}
-                  </div>
-                  <p>“{review.content}”</p>
-                  <strong>{review.author_name}</strong>
-                  {review.source && <small>{review.source}</small>}
-                </article>
-              ))
-            ) : (
-              <article className="review-card review-card--empty">
-                <MessageCircle size={26} />
-                <strong>Il tuo parere conta.</strong>
-                <p>
-                  Il nostro obiettivo è costruire un rapporto di fiducia in ogni fase del percorso.
-                </p>
-                <Link to="/contatti">Scrivici per raccontarci la tua esperienza →</Link>
-              </article>
-            )}
+          <div className="review-widget-panel">
+            <ElfsightReviews />
           </div>
         </div>
       </section>
@@ -333,11 +285,11 @@ export default function HomePage() {
             </p>
             <Button
               component={Link}
-              to="/faq"
+              to="/contatti"
               variant="outlined"
               endIcon={<ArrowRight size={16} />}
             >
-              Tutte le FAQ
+              Hai altre domande? Contattaci
             </Button>
           </div>
           <div className="faq-list" aria-label="Domande frequenti">
