@@ -9,6 +9,7 @@ Requisiti: Node.js 20+ e npm.
 1. Clona il repository e installa le dipendenze con `npm install`.
 2. Copia `.env.example` in `.env.local`.
 3. Inserisci URL del progetto Supabase e chiave anon/publishable in `.env.local`.
+4. Imposta `VITE_ELFSIGHT_REVIEWS_WIDGET_ID` con l’ID del widget Elfsight (la parte dopo `elfsight-app-` nel codice di incorporamento).
 4. Avvia con `npm run dev`; verifica con `npm run build`.
 
 Senza configurazione Supabase il sito non mostra annunci. Le sezioni immobili mostrano uno stato vuoto finché non sono disponibili record reali pubblicati nel database. Non sono incluse schede immobiliari di esempio.
@@ -33,6 +34,7 @@ Imposta le variabili Vite in locale e nell'hosting:
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_SITE_URL` (URL canonico del sito pubblicato)
+- `VITE_ELFSIGHT_REVIEWS_WIDGET_ID` (ID del widget recensioni Elfsight, senza il prefisso `elfsight-app-`)
 
 La chiave anon è destinata al client e resta protetta dalle policy RLS. La service role key è esclusivamente server-side.
 
@@ -48,7 +50,7 @@ npx supabase projects list
 npx supabase link --project-ref TUO_PROJECT_REF
 ```
 
-Se la migrazione SQL non è stata ancora eseguita, applicala tramite SQL Editor (file `supabase/migrations/202610130001_initial_schema.sql`) oppure, dopo aver collegato il progetto, usa `npx supabase db push`. Se l'hai già eseguita manualmente, non rieseguire alla cieca una seconda procedura di migrazione.
+Per un progetto nuovo, applica tramite SQL Editor `supabase/migrations/202610130001_initial_schema.sql` oppure usa `npx supabase db push`. Se il database era già stato inizializzato con una versione precedente del progetto, applica anche la migrazione `supabase/migrations/202610140001_remove_reviews_table_use_elfsight.sql` (con `npx supabase db push` oppure eseguendo quel file in SQL Editor): rimuove la tabella `reviews`, perché le recensioni saranno fornite dal widget Elfsight e non salvate in Supabase. Non rieseguire alla cieca la migrazione iniziale su un database già attivo.
 
 Distribuisci le funzioni dal repository:
 
@@ -80,7 +82,7 @@ La funzione seleziona fino a tre annunci compatibili per ogni ricerca attiva e u
 
 ## Contenuti e gestione
 
-Dal percorso `/admin` l'amministratore può gestire gli annunci (creazione, modifica, cancellazione, stato, prezzo, caratteristiche, foto, descrizione formattata e selezione “In evidenza”), le FAQ e le richieste ricevute. Le schede in evidenza appaiono in home; tutti gli immobili pubblicati sono raggiungibili dalla pagina Immobili e dalla ricerca. Le immagini sono caricate da locale sul bucket Supabase e scorrono in un carosello sulla scheda di dettaglio.
+Dal percorso `/admin` l'amministratore può gestire gli annunci (creazione, modifica, cancellazione, stato, prezzo, caratteristiche, foto, descrizione formattata e selezione “In evidenza”), le FAQ mostrate in home e le richieste ricevute. Le recensioni sono caricate tramite il widget Elfsight, non da Supabase. Le schede in evidenza appaiono in home; tutti gli immobili pubblicati sono raggiungibili dalla pagina Immobili e dalla ricerca. Le immagini sono caricate da locale sul bucket Supabase e scorrono in un carosello sulla scheda di dettaglio.
 
 Per il primo accesso non esistono credenziali preimpostate: crea un utente Auth e il relativo record in `admin_profiles` come sopra. Le sessioni sono gestite da Supabase Auth e persistono tra gli accessi; il logout invalida la sessione locale.
 
@@ -95,7 +97,7 @@ Per il primo accesso non esistono credenziali preimpostate: crea un utente Auth 
 
 ## Funzionalità incluse
 
-- Pagine responsive: Home, Immobili, dettaglio dinamico, Chi siamo, Valutazione immobile, Consulenza mutui e prestiti, Pubblica con noi, FAQ.
+- Pagine responsive: Home (incluse FAQ e widget recensioni Elfsight), Immobili, dettaglio dinamico, Chi siamo, Valutazione immobile, Consulenza mutui e prestiti, Pubblica con noi.
 - Ricerca immobili per località, operazione, tipologia e budget.
 - Schede SEO con titolo, descrizione, canonical, Open Graph e dati strutturati quando disponibili.
 - Richiesta di valutazione, contatto e avvisi email basati sulle preferenze di ricerca.
