@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.notify-property-alerts]
 verify_jwt = false
+
+[functions.notify-office-lead]
+verify_jwt = false
