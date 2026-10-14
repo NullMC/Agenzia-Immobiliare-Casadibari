@@ -152,7 +152,6 @@ export default function SiteLayout() {
             <Link to="/valutazione">Valuta casa</Link>
             <Link to="/pubblica-con-noi">Pubblica con noi</Link>
             <Link to="/consulenza-mutui">Mutui e prestiti</Link>
-            <Link to="/faq">Domande frequenti</Link>
           </div>
           <div className="footer-column">
             <h3>Contatti</h3>
