@@ -18,7 +18,6 @@ import {
   Save,
   Settings,
   ShieldCheck,
-  Star,
   Trash2,
   Users,
   X,
@@ -27,9 +26,9 @@ import { Alert, Button, IconButton, TextField } from '@mui/material';
 import Seo from '../components/Seo';
 import RichTextEditor from '../components/RichTextEditor';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import type { ContactSettings, Faq, Property, PropertyImage, Review, TeamMember } from '../types';
 
-type Tab = 'properties' | 'faqs' | 'requests' | 'team' | 'reviews' | 'settings';
+
+
 type PropertyForm = {
   title: string;
   subtitle: string;
@@ -59,13 +58,6 @@ type TeamForm = {
   email: string;
   phone: string;
   active: boolean;
-};
-type ReviewForm = {
-  author_name: string;
-  rating: string;
-  content: string;
-  source: string;
-  approved: boolean;
 };
 type Inquiry = {
   id: string;
@@ -113,13 +105,6 @@ const blankTeam: TeamForm = {
   email: '',
   phone: '',
   active: true,
-};
-const blankReview: ReviewForm = {
-  author_name: '',
-  rating: '5',
-  content: '',
-  source: '',
-  approved: false,
 };
 const blankContact: ContactSettings = {
   businessName: 'Casadibari Immobiliare sas di Casadibari Maurizio & C',
@@ -182,7 +167,6 @@ export default function AdminPage() {
   const [valuations, setValuations] = useState<Inquiry[]>([]);
   const [contacts, setContacts] = useState<Inquiry[]>([]);
   const [team, setTeam] = useState<TeamMember[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
   const [contactSettings, setContactSettings] = useState<ContactSettings>(blankContact);
   const [dataLoading, setDataLoading] = useState(false);
 
@@ -197,9 +181,6 @@ export default function AdminPage() {
   const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
   const [teamForm, setTeamForm] = useState<TeamForm>(blankTeam);
   const [teamSaving, setTeamSaving] = useState(false);
-  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
-  const [reviewForm, setReviewForm] = useState<ReviewForm>(blankReview);
-  const [reviewSaving, setReviewSaving] = useState(false);
   const [settingsSaving, setSettingsSaving] = useState(false);
 
   useEffect(() => {
@@ -259,7 +240,6 @@ export default function AdminPage() {
       valuationResult,
       contactResult,
       teamResult,
-      reviewResult,
       settingResult,
     ] = await Promise.all([
       supabase
@@ -270,7 +250,6 @@ export default function AdminPage() {
       supabase.from('valuation_requests').select('*').order('created_at', { ascending: false }),
       supabase.from('contact_requests').select('*').order('created_at', { ascending: false }),
       supabase.from('team_members').select('*').order('sort_order'),
-      supabase.from('reviews').select('*').order('sort_order'),
       supabase.from('site_settings').select('value').eq('key', 'contact').maybeSingle(),
     ]);
     const anyError =
@@ -279,7 +258,6 @@ export default function AdminPage() {
       valuationResult.error ||
       contactResult.error ||
       teamResult.error ||
-      reviewResult.error ||
       settingResult.error;
     if (propertyResult.data) setProperties(propertyResult.data as Property[]);
     if (faqResult.data) setFaqs(faqResult.data as Faq[]);
@@ -312,7 +290,6 @@ export default function AdminPage() {
         ),
       );
     if (teamResult.data) setTeam(teamResult.data as TeamMember[]);
-    if (reviewResult.data) setReviews(reviewResult.data as Review[]);
     if (settingResult.data?.value)
       setContactSettings({ ...blankContact, ...(settingResult.data.value as ContactSettings) });
     if (anyError)
@@ -586,39 +563,6 @@ export default function AdminPage() {
     await loadData();
   };
 
-  const saveReview = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setReviewSaving(true);
-    setNotice('');
-    const payload = {
-      author_name: reviewForm.author_name.trim(),
-      rating: Number(reviewForm.rating),
-      content: reviewForm.content.trim(),
-      source: reviewForm.source.trim(),
-      approved: reviewForm.approved,
-      sort_order: editingReviewId
-        ? reviews.find((review) => review.id === editingReviewId)?.sort_order || 0
-        : reviews.length + 1,
-    };
-    const result = editingReviewId
-      ? await supabase.from('reviews').update(payload).eq('id', editingReviewId)
-      : await supabase.from('reviews').insert(payload);
-    setReviewSaving(false);
-    if (result.error) setNotice('Salvataggio recensione non riuscito: ' + result.error.message);
-    else {
-      setReviewForm({ ...blankReview });
-      setEditingReviewId(null);
-      setNotice('Recensione salvata.');
-      await loadData();
-    }
-  };
-  const deleteReview = async (review: Review) => {
-    if (!window.confirm('Eliminare la recensione di ' + review.author_name + '?')) return;
-    const { error } = await supabase.from('reviews').delete().eq('id', review.id);
-    setNotice(error ? error.message : 'Recensione eliminata.');
-    await loadData();
-  };
-
   const saveSettings = async (event: React.FormEvent) => {
     event.preventDefault();
     setSettingsSaving(true);
@@ -738,7 +682,6 @@ export default function AdminPage() {
     { id: 'faqs', label: 'FAQ', icon: <MessageSquare size={18} /> },
     { id: 'requests', label: 'Richieste', icon: <ClipboardList size={18} /> },
     { id: 'team', label: 'Team', icon: <Users size={18} /> },
-    { id: 'reviews', label: 'Recensioni', icon: <Star size={18} /> },
     { id: 'settings', label: 'Contatti e sito', icon: <Settings size={18} /> },
   ];
   const newRequestCount =
@@ -1630,158 +1573,6 @@ export default function AdminPage() {
                     <div className="admin-empty">
                       <Users size={27} />
                       <p>Aggiungi le persone che desideri presentare nella pagina Chi siamo.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </section>
-          )}
-
-          {activeTab === 'reviews' && (
-            <section>
-              <div className="admin-section-heading">
-                <div>
-                  <h2>Widget recensioni</h2>
-                  <p>
-                    Inserisci e approva recensioni da mostrare pubblicamente. Pubblica solo
-                    recensioni autentiche con autorizzazione.
-                  </p>
-                </div>
-              </div>
-              <div className="admin-two-col">
-                <form className="admin-editor admin-editor--simple" onSubmit={saveReview}>
-                  <div className="admin-editor__title">
-                    <h3>{editingReviewId ? 'Modifica recensione' : 'Aggiungi recensione'}</h3>
-                    {editingReviewId && (
-                      <button
-                        type="button"
-                        className="icon-button"
-                        onClick={() => {
-                          setEditingReviewId(null);
-                          setReviewForm({ ...blankReview });
-                        }}
-                        aria-label="Annulla modifica"
-                      >
-                        <X size={18} />
-                      </button>
-                    )}
-                  </div>
-                  <label className="field">
-                    <span>Nome mostrato *</span>
-                    <input
-                      required
-                      value={reviewForm.author_name}
-                      onChange={(e) =>
-                        setReviewForm((current) => ({ ...current, author_name: e.target.value }))
-                      }
-                    />
-                  </label>
-                  <label className="field">
-                    <span>Valutazione</span>
-                    <select
-                      value={reviewForm.rating}
-                      onChange={(e) =>
-                        setReviewForm((current) => ({ ...current, rating: e.target.value }))
-                      }
-                    >
-                      {['5', '4', '3', '2', '1'].map((value) => (
-                        <option key={value} value={value}>
-                          {value} stelle
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="field">
-                    <span>Recensione *</span>
-                    <textarea
-                      required
-                      rows={5}
-                      value={reviewForm.content}
-                      onChange={(e) =>
-                        setReviewForm((current) => ({ ...current, content: e.target.value }))
-                      }
-                    />
-                  </label>
-                  <label className="field">
-                    <span>Fonte (facoltativa)</span>
-                    <input
-                      value={reviewForm.source}
-                      onChange={(e) =>
-                        setReviewForm((current) => ({ ...current, source: e.target.value }))
-                      }
-                      placeholder="Es. Google"
-                    />
-                  </label>
-                  <label className="check-field">
-                    <input
-                      type="checkbox"
-                      checked={reviewForm.approved}
-                      onChange={(e) =>
-                        setReviewForm((current) => ({ ...current, approved: e.target.checked }))
-                      }
-                    />
-                    <span>Approva e mostra sul sito</span>
-                  </label>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    type="submit"
-                    disabled={reviewSaving}
-                    startIcon={<Save size={16} />}
-                  >
-                    {reviewSaving ? 'Salvataggio…' : 'Salva recensione'}
-                  </Button>
-                </form>
-                <div className="admin-stack">
-                  {reviews.map((review) => (
-                    <article className="admin-content-item" key={review.id}>
-                      <div className="admin-review-rating">
-                        {Array.from({ length: review.rating }).map((_, index) => (
-                          <Star size={15} key={index} fill="currentColor" />
-                        ))}
-                        <span
-                          className={'admin-visibility ' + (review.approved ? 'is-published' : '')}
-                        >
-                          {review.approved ? 'Pubblicata' : 'Da approvare'}
-                        </span>
-                      </div>
-                      <h3>{review.author_name}</h3>
-                      <p>{review.content}</p>
-                      {review.source && <small>{review.source}</small>}
-                      <div className="admin-actions">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingReviewId(review.id);
-                            setReviewForm({
-                              author_name: review.author_name,
-                              rating: String(review.rating),
-                              content: review.content,
-                              source: review.source,
-                              approved: review.approved,
-                            });
-                          }}
-                          aria-label="Modifica recensione"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => void deleteReview(review)}
-                          aria-label="Elimina recensione"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                  {!reviews.length && (
-                    <div className="admin-empty">
-                      <Star size={27} />
-                      <p>
-                        Non sono ancora presenti recensioni. Nessuna recensione fittizia è stata
-                        preinserita.
-                      </p>
                     </div>
                   )}
                 </div>
