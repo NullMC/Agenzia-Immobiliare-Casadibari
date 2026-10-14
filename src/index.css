@@ -70,8 +70,8 @@ h1, h2, h3, h4 { margin-top: 0; color: var(--ink); line-height: 1.15; }
 .top-strip__contacts a:hover { color: var(--brand-dark); }
 .site-header { position: sticky; z-index: 50; top: 0; background: rgba(255,255,255,.96); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(226,234,226,.9); }
 .site-header__inner { min-height: 88px; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
-.brand { width: 174px; flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; }
-.brand img { width: 170px; height: 56px; object-fit: contain; object-position: left center; }
+.brand { width: 210px; flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; }
+.brand img { width: 205px; height: 68px; object-fit: contain; object-position: left center; }
 .brand__tagline { color: #718071; font-size: 9px; letter-spacing: .04em; margin-top: -2px; }
 .main-nav { display: flex; align-items: center; justify-content: flex-end; gap: clamp(13px, 2vw, 27px); }
 .main-nav__link { position: relative; display: inline-flex; align-items: center; padding: 12px 0; color: #455247; font-size: 13px; font-weight: 600; white-space: nowrap; transition: color .18s ease; }
