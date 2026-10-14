@@ -13,12 +13,12 @@ import {
   MapPin,
   Phone,
   ShieldCheck,
-  Star,
   Users,
 } from 'lucide-react';
 import Seo from '../components/Seo';
+import ElfsightReviews from '../components/ElfsightReviews';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { demoFaqs, type ContactSettings, type Faq, type Review, type TeamMember } from '../types';
+import { type ContactSettings, type TeamMember } from '../types';
 
 const defaultContact: ContactSettings = {
   businessName: 'Casadibari Immobiliare sas di Casadibari Maurizio & C',
@@ -50,17 +50,14 @@ function PageHero({
 
 export function AboutPage() {
   const [team, setTeam] = useState<TeamMember[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
   const [contact, setContact] = useState<ContactSettings>(defaultContact);
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     Promise.all([
       supabase.from('team_members').select('*').eq('active', true).order('sort_order'),
-      supabase.from('reviews').select('*').eq('approved', true).order('sort_order'),
       supabase.from('site_settings').select('value').eq('key', 'contact').maybeSingle(),
-    ]).then(([teamResult, reviewsResult, settingsResult]) => {
+    ]).then(([teamResult, settingsResult]) => {
       if (!teamResult.error) setTeam((teamResult.data || []) as TeamMember[]);
-      if (!reviewsResult.error) setReviews((reviewsResult.data || []) as Review[]);
       if (settingsResult.data?.value)
         setContact({ ...defaultContact, ...(settingsResult.data.value as ContactSettings) });
     });
@@ -159,36 +156,10 @@ export function AboutPage() {
             <div>
               <span className="eyebrow">Le esperienze dei clienti</span>
               <h2>Le parole che ci fanno crescere</h2>
-              <p>
-                Le recensioni pubblicate sono gestite dall’agenzia per mantenere aggiornato questo
-                spazio.
-              </p>
+              <p>Leggi le recensioni dei clienti tramite il widget Elfsight.</p>
             </div>
           </div>
-          {reviews.length ? (
-            <div className="review-cards review-cards--light">
-              {reviews.map((review) => (
-                <article key={review.id} className="review-card">
-                  <div className="review-stars">
-                    {Array.from({ length: review.rating }).map((_, i) => (
-                      <Star size={15} key={i} fill="currentColor" />
-                    ))}
-                  </div>
-                  <p>“{review.content}”</p>
-                  <strong>{review.author_name}</strong>
-                  {review.source && <small>{review.source}</small>}
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="review-placeholder">
-              <Star size={22} />
-              <div>
-                <strong>Recensioni in aggiornamento</strong>
-                <p>Lo spazio è predisposto per mostrare le recensioni approvate dall’agenzia.</p>
-              </div>
-            </div>
-          )}
+          <ElfsightReviews />
         </div>
       </section>
       <section className="section section--soft">
@@ -717,67 +688,6 @@ export function PublishPage() {
               </p>
             )}
           </form>
-        </div>
-      </section>
-    </>
-  );
-}
-
-export function FaqPage() {
-  const [faqs, setFaqs] = useState<Faq[]>(isSupabaseConfigured ? [] : demoFaqs);
-  useEffect(() => {
-    if (!isSupabaseConfigured) return;
-    supabase
-      .from('faqs')
-      .select('*')
-      .eq('published', true)
-      .order('sort_order')
-      .then(({ data, error }) => {
-        if (!error) setFaqs((data || []) as Faq[]);
-      });
-  }, []);
-  return (
-    <>
-      <Seo
-        title="Domande frequenti | Casadibari Immobiliare"
-        description="Risposte alle domande più frequenti sulla ricerca degli immobili, le valutazioni, le visite e gli avvisi email Casadibari."
-        path="/faq"
-      />
-      <PageHero
-        eyebrow="Siamo qui per aiutarti"
-        title="Domande frequenti"
-        description="Le prime risposte per orientarti nel tuo percorso immobiliare."
-      />
-      <section className="section">
-        <div className="container faq-layout">
-          <div>
-            <span className="eyebrow">Le risposte che cerchi</span>
-            <h2>Dubbi? Partiamo da qui.</h2>
-            <p>
-              Se non trovi l’informazione di cui hai bisogno, contattaci: saremo felici di
-              approfondire.
-            </p>
-            <Button
-              component={Link}
-              to="/contatti"
-              variant="outlined"
-              endIcon={<ArrowRight size={16} />}
-            >
-              Fai una domanda
-            </Button>
-          </div>
-          <div className="faq-list">
-            {faqs.map((faq, index) => (
-              <details className="faq-item" key={faq.id} open={index === 0}>
-                <summary>
-                  <span>{faq.question}</span>
-                  <span className="faq-plus">+</span>
-                </summary>
-                <p>{faq.answer}</p>
-              </details>
-            ))}
-            {!faqs.length && <p>Le risposte sono in aggiornamento. Contattaci per informazioni.</p>}
-          </div>
         </div>
       </section>
     </>
