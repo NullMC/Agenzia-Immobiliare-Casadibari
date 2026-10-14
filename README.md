@@ -8,7 +8,7 @@ Requisiti: Node.js 20+ e npm.
 
 1. Clona il repository e installa le dipendenze con `npm install`.
 2. Copia `.env.example` in `.env.local`.
-3. Inserisci URL del progetto Supabase e chiave anon/publishable in `.env.local`.
+3. Inserisci `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env.local` usando la chiave publishable del progetto.
 4. Imposta `VITE_ELFSIGHT_REVIEWS_WIDGET_ID` con l’ID del widget Elfsight (la parte dopo `elfsight-app-` nel codice di incorporamento).
 4. Avvia con `npm run dev`; verifica con `npm run build`.
 
@@ -32,7 +32,7 @@ L'UUID si trova in Authentication → Users. Il login nel sito usa username e pa
 Imposta le variabili Vite in locale e nell'hosting:
 
 - `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+- `VITE_SUPABASE_PUBLISHABLE_KEY` (oppure `VITE_SUPABASE_ANON_KEY` per compatibilità con configurazioni precedenti)
 - `VITE_SITE_URL` (URL canonico del sito pubblicato)
 - `VITE_ELFSIGHT_REVIEWS_WIDGET_ID` (ID del widget recensioni Elfsight, senza il prefisso `elfsight-app-`)
 
@@ -60,7 +60,7 @@ npx supabase functions deploy notify-property-alerts --use-api
 npx supabase functions list
 ```
 
-Le variabili `SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY` sono rese disponibili nell'ambiente delle Edge Functions da Supabase (la chiave service role/secret resta solo server-side): non inserirle nel bundle React e non provare a creare nuovi Function Secrets con prefisso `SUPABASE_`.
+Le Edge Functions Supabase possono ricevere `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` e `SUPABASE_SECRET_KEYS` (dizionari JSON nominati), oltre alle variabili legacy `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY`. La funzione `admin-login` legge i nomi nuovi e quelli legacy. Non inserire mai chiavi secret/service role nel bundle React e non creare Function Secrets personalizzati con prefisso riservato `SUPABASE_`.
 
 Per gli avvisi email, imposta nei **Project Settings → Edge Functions → Secrets** (oppure con `npx supabase secrets set`) questi segreti personalizzati:
 
