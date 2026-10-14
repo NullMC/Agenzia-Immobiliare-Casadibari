@@ -26,9 +26,9 @@ import { Alert, Button, IconButton, TextField } from '@mui/material';
 import Seo from '../components/Seo';
 import RichTextEditor from '../components/RichTextEditor';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import type { ContactSettings, Faq, Property, PropertyImage, TeamMember } from '../types';
 
-
-
+type Tab = 'properties' | 'faqs' | 'requests' | 'team' | 'settings';
 type PropertyForm = {
   title: string;
   subtitle: string;
