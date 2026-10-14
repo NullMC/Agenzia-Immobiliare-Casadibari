@@ -626,9 +626,9 @@ export default function AdminPage() {
           <p>Accedi per gestire annunci, fotografie, richieste e contenuti del sito.</p>
           {!isSupabaseConfigured && (
             <div className="admin-warning">
-              Connessione a Supabase non configurata nella build corrente. In Cloudflare Pages
-              apri Settings → Variables and Secrets e imposta le variabili di build
-              VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY, poi avvia un nuovo deploy.
+              La configurazione di Supabase non è disponibile in questa build del sito.
+              Imposta le variabili VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY
+              nell'ambiente usato per compilare il progetto, quindi ricompila e ripubblica il sito.
               In locale, inseriscile nel file .env.local e riavvia Vite. Non inserire qui la chiave
               SUPABASE_SECRET_KEY: deve restare esclusivamente lato server.
             </div>
