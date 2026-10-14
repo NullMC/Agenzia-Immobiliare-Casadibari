@@ -25,7 +25,7 @@ import {
 import { Alert, Button, IconButton, TextField } from '@mui/material';
 import Seo from '../components/Seo';
 import RichTextEditor from '../components/RichTextEditor';
-import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import type { ContactSettings, Faq, Property, PropertyImage, TeamMember } from '../types';
 
 type Tab = 'properties' | 'faqs' | 'requests' | 'team' | 'settings';
@@ -160,7 +160,6 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [loginBusy, setLoginBusy] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('properties');
-  const [dashboardError, setDashboardError] = useState('');
   const [notice, setNotice] = useState('');
   const [properties, setProperties] = useState<Property[]>([]);
   const [faqs, setFaqs] = useState<Faq[]>([]);
@@ -184,10 +183,6 @@ export default function AdminPage() {
   const [settingsSaving, setSettingsSaving] = useState(false);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setSessionBooting(false);
-      return;
-    }
     supabase.auth
       .getSession()
       .then(({ data }) => {
@@ -233,7 +228,6 @@ export default function AdminPage() {
   const loadData = useCallback(async () => {
     if (!profile) return;
     setDataLoading(true);
-    setDashboardError('');
     const [
       propertyResult,
       faqResult,
@@ -252,13 +246,6 @@ export default function AdminPage() {
       supabase.from('team_members').select('*').order('sort_order'),
       supabase.from('site_settings').select('value').eq('key', 'contact').maybeSingle(),
     ]);
-    const anyError =
-      propertyResult.error ||
-      faqResult.error ||
-      valuationResult.error ||
-      contactResult.error ||
-      teamResult.error ||
-      settingResult.error;
     if (propertyResult.data) setProperties(propertyResult.data as Property[]);
     if (faqResult.data) setFaqs(faqResult.data as Faq[]);
     if (valuationResult.data)
@@ -292,10 +279,6 @@ export default function AdminPage() {
     if (teamResult.data) setTeam(teamResult.data as TeamMember[]);
     if (settingResult.data?.value)
       setContactSettings({ ...blankContact, ...(settingResult.data.value as ContactSettings) });
-    if (anyError)
-      setDashboardError(
-        'Alcuni dati non sono stati caricati. Verifica le policy RLS e che la migrazione Supabase sia stata eseguita.',
-      );
     setDataLoading(false);
   }, [profile]);
 
@@ -306,10 +289,6 @@ export default function AdminPage() {
   const login = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoginError('');
-    if (!isSupabaseConfigured) {
-      setLoginError('Configura prima VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY.');
-      return;
-    }
     setLoginBusy(true);
     const { data, error } = await supabase.functions.invoke('admin-login', {
       body: { username: loginUsername.trim(), password: loginPassword },
@@ -317,7 +296,7 @@ export default function AdminPage() {
     if (error || !data?.session?.access_token || !data?.session?.refresh_token) {
       setLoginError(
         data?.error ||
-          'Accesso non riuscito. Verifica username e password oppure controlla la Edge Function admin-login.',
+          'Accesso non riuscito. Verifica username e password e riprova.',
       );
       setLoginBusy(false);
       return;
@@ -624,15 +603,6 @@ export default function AdminPage() {
           <span className="eyebrow">Area riservata</span>
           <h1>Benvenuto nel backoffice.</h1>
           <p>Accedi per gestire annunci, fotografie, richieste e contenuti del sito.</p>
-          {!isSupabaseConfigured && (
-            <div className="admin-warning">
-              La configurazione di Supabase non è disponibile in questa build del sito.
-              Imposta le variabili VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY
-              nell'ambiente usato per compilare il progetto, quindi ricompila e ripubblica il sito.
-              In locale, inseriscile nel file .env.local e riavvia Vite. Non inserire qui la chiave
-              SUPABASE_SECRET_KEY: deve restare esclusivamente lato server.
-            </div>
-          )}
           <form onSubmit={login}>
             <TextField
               className="admin-login-mui-field"
@@ -665,7 +635,7 @@ export default function AdminPage() {
               fullWidth
               size="large"
               type="submit"
-              disabled={loginBusy || !isSupabaseConfigured}
+              disabled={loginBusy}
               endIcon={<ArrowLeft className="login-arrow" size={17} />}
             >
               {loginBusy ? 'Accesso in corso…' : 'Accedi'}
@@ -757,11 +727,6 @@ export default function AdminPage() {
           </div>
         </header>
         <div className="admin-content">
-          {dashboardError && (
-            <Alert severity="error" className="admin-mui-alert">
-              {dashboardError}
-            </Alert>
-          )}
           {notice && (
             <Alert
               severity={
