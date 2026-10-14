@@ -60,6 +60,29 @@ function money(value: number | null): string {
   }).format(value);
 }
 
+/**
+ * Current Supabase projects expose named API-key dictionaries; older projects
+ * may still expose the legacy single service-role environment variable.
+ */
+function readNamedKey(variable: string): string | undefined {
+  const value = Deno.env.get(variable);
+  if (!value) return undefined;
+
+  try {
+    const parsed = JSON.parse(value) as Record<string, unknown>;
+    const defaultKey = parsed.default;
+    if (typeof defaultKey === 'string' && defaultKey.trim()) return defaultKey.trim();
+
+    const firstKey = Object.values(parsed).find(
+      (item): item is string => typeof item === 'string' && item.trim().length > 0,
+    );
+    if (firstKey) return firstKey.trim();
+  } catch {
+    // The variable can be absent or not a JSON dictionary.
+  }
+  return undefined;
+}
+
 function locationMatches(preference: string, property: PropertyRecord): boolean {
   const query = (preference || '').trim().toLocaleLowerCase('it-IT');
   if (!query || query === 'tutte' || query === '*') return true;
@@ -157,7 +180,10 @@ Deno.serve(async (request: Request) => {
     return new Response('Unauthorized', { status: 401 });
   }
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const serviceKey =
+    Deno.env.get('SUPABASE_SECRET_KEY') ||
+    readNamedKey('SUPABASE_SECRET_KEYS') ||
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
   const resendKey = Deno.env.get('RESEND_API_KEY');
   const fromEmail = Deno.env.get('RESEND_FROM_EMAIL');
   const siteUrl = Deno.env.get('SITE_URL') || 'https://casadibari.altervista.org';
