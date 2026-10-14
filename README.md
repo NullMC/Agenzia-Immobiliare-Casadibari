@@ -57,28 +57,50 @@ Distribuisci le funzioni dal repository:
 ```powershell
 npx supabase functions deploy admin-login --use-api
 npx supabase functions deploy notify-property-alerts --use-api
+npx supabase functions deploy notify-office-lead --use-api
 npx supabase functions list
 ```
 
 Le Edge Functions Supabase possono ricevere `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` e `SUPABASE_SECRET_KEYS` (dizionari JSON nominati), oltre alle variabili legacy `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY`. La funzione `admin-login` legge i nomi nuovi e quelli legacy. Non inserire mai chiavi secret/service role nel bundle React e non creare Function Secrets personalizzati con prefisso riservato `SUPABASE_`.
 
-Per gli avvisi email, imposta nei **Project Settings → Edge Functions → Secrets** (oppure con `npx supabase secrets set`) questi segreti personalizzati:
+Per l'invio email, imposta nei **Project Settings → Edge Functions → Secrets** (oppure con `npx supabase secrets set`) questi segreti personalizzati:
 
 - `RESEND_API_KEY`: chiave API Resend.
-- `RESEND_FROM_EMAIL`: mittente email autorizzato/verificato su Resend, ad esempio `Casadibari Immobiliare <immobili@tuodominio.it>`.
-- `SITE_URL`: URL pubblico canonico del sito.
-- `NOTIFICATION_WEBHOOK_SECRET`: stringa casuale lunga, da conservare privata e usare identica nell'header del webhook.
+- `RESEND_FROM_EMAIL`: mittente autorizzato/verificato su Resend, ad esempio `Casadibari Immobiliare <immobili@tuodominio.it>`.
+- `SITE_URL`: URL pubblico canonico del sito, senza slash finale; usato nei link agli annunci.
+- `NOTIFICATION_WEBHOOK_SECRET`: stringa casuale lunga, privata, usata identica nell'header `x-hook-secret` dei webhook.
+- `OFFICE_NOTIFICATION_EMAIL`: casella che deve ricevere le nuove richieste, valutazioni e iscrizioni agli avvisi, ad esempio `info@casadibari.it` se è la casella dell'ufficio.
+
+Non aggiungere queste credenziali al front-end e non salvarle in GitHub. `RESEND_API_KEY` e `RESEND_FROM_EMAIL` sono condivisi dai due flussi email; `NOTIFICATION_WEBHOOK_SECRET` protegge i webhook verso entrambe le funzioni.
 
 Per completare il login amministratore, crea prima un utente in **Authentication → Users**, poi inserisci il suo UUID, uno username minuscolo e la stessa email in `public.admin_profiles` (vedi query SQL nella sezione precedente).
 
-Per gli avvisi automatici, apri **Database → Webhooks** e crea un webhook:
+**Webhook A — avvisi ai clienti per nuovi immobili**
+
+In **Database → Webhooks**, crea un webhook con:
 - tabella: `public.property_notification_queue`;
 - evento: `INSERT`;
 - URL: `https://TUO_PROJECT_REF.supabase.co/functions/v1/notify-property-alerts`;
-- header personalizzato: `x-hook-secret` con lo stesso valore di `NOTIFICATION_WEBHOOK_SECRET`;
-- metodo: `POST`, con payload JSON del record.
+- metodo: `POST`, payload JSON del record;
+- header HTTP personalizzato: `x-hook-secret`, con lo stesso valore di `NOTIFICATION_WEBHOOK_SECRET`.
 
-La funzione seleziona fino a tre annunci compatibili per ogni ricerca attiva e usa Resend per inviarli. Pubblica un immobile di test, verifica che venga creata una riga in `property_notification_queue`, poi controlla le consegne del webhook e i log delle Edge Functions. La sola distribuzione delle funzioni non abilita automaticamente le email: servono anche i segreti Resend e il webhook.
+Quando viene pubblicato o aggiornato un annuncio disponibile, il trigger SQL inserisce un record nella coda. La funzione seleziona fino a tre proposte compatibili per ogni ricerca attiva e invia la comunicazione al cliente.
+
+**Webhook B — email alla casella dell'ufficio**
+
+Crea **tre** webhook, tutti diretti alla stessa funzione `notify-office-lead`, ciascuno con evento `INSERT`, metodo `POST`, payload JSON del record e header `x-hook-secret` impostato allo stesso valore di `NOTIFICATION_WEBHOOK_SECRET`:
+
+| Tabella | URL della funzione | Email inviata all'ufficio |
+|---|---|---|
+| `public.contact_requests` | `https://TUO_PROJECT_REF.supabase.co/functions/v1/notify-office-lead` | Modulo Contatti e “Pubblica con noi” |
+| `public.valuation_requests` | `https://TUO_PROJECT_REF.supabase.co/functions/v1/notify-office-lead` | Richiesta di valutazione |
+| `public.property_alerts` | `https://TUO_PROJECT_REF.supabase.co/functions/v1/notify-office-lead` | Nuova iscrizione agli avvisi di ricerca |
+
+La richiesta viene prima salvata nella relativa tabella Supabase; il webhook poi avvia l'email all'indirizzo configurato in `OFFICE_NOTIFICATION_EMAIL`. I messaggi includono i dati del modulo. La notifica alla casella dell'ufficio non sostituisce la registrazione nel database.
+
+**Verifica completa:** attiva un indirizzo email di prova per gli avvisi, invia una richiesta di contatto, una valutazione e un'iscrizione alla ricerca; controlla che le tre righe esistano nelle rispettive tabelle, che l'ufficio riceva le email e che i log delle Edge Functions non mostrino errori. Pubblica inoltre un immobile disponibile compatibile con la ricerca di prova e verifica che arrivi al cliente una email con gli annunci pertinenti.
+
+Distribuire le funzioni non crea automaticamente i webhook: configurali tutti in **Database → Webhooks** e verifica che siano abilitati.
 
 ## Contenuti e gestione
 
