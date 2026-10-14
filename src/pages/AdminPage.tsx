@@ -626,8 +626,11 @@ export default function AdminPage() {
           <p>Accedi per gestire annunci, fotografie, richieste e contenuti del sito.</p>
           {!isSupabaseConfigured && (
             <div className="admin-warning">
-              Per abilitare il login, configura le variabili Supabase e distribuisci la funzione
-              admin-login. Nessuna credenziale predefinita è inclusa nel progetto.
+              Connessione a Supabase non configurata nella build corrente. In Cloudflare Pages
+              apri Settings → Variables and Secrets e imposta le variabili di build
+              VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY, poi avvia un nuovo deploy.
+              In locale, inseriscile nel file .env.local e riavvia Vite. Non inserire qui la chiave
+              SUPABASE_SECRET_KEY: deve restare esclusivamente lato server.
             </div>
           )}
           <form onSubmit={login}>
