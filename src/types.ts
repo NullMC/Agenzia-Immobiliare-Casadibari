@@ -78,16 +78,6 @@ export interface TeamMember {
   sort_order: number;
 }
 
-export interface Review {
-  id: string;
-  author_name: string;
-  rating: number;
-  content: string;
-  source: string;
-  approved: boolean;
-  sort_order: number;
-}
-
 export const demoFaqs: Faq[] = [
   {
     id: 'faq-1',

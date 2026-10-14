@@ -215,17 +215,6 @@ create table if not exists public.team_members (
 create trigger team_members_set_updated_at before update on public.team_members
   for each row execute function public.set_updated_at();
 
-create table if not exists public.reviews (
-  id uuid primary key default gen_random_uuid(),
-  author_name text not null,
-  rating integer not null check (rating between 1 and 5),
-  content text not null,
-  source text not null default '',
-  approved boolean not null default false,
-  sort_order integer not null default 0,
-  created_at timestamptz not null default now()
-);
-
 create table if not exists public.site_settings (
   key text primary key,
   value jsonb not null default '{}'::jsonb,
@@ -268,7 +257,6 @@ alter table public.property_alert_deliveries enable row level security;
 alter table public.property_notification_queue enable row level security;
 alter table public.faqs enable row level security;
 alter table public.team_members enable row level security;
-alter table public.reviews enable row level security;
 alter table public.site_settings enable row level security;
 
 create policy "Admins can read their own admin profile"
@@ -337,13 +325,6 @@ create policy "Admins can manage team members"
   on public.team_members for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
-create policy "Public can read approved reviews"
-  on public.reviews for select to anon, authenticated
-  using (approved = true);
-create policy "Admins can manage reviews"
-  on public.reviews for all to authenticated
-  using (public.is_admin()) with check (public.is_admin());
-
 create policy "Public can read site settings"
   on public.site_settings for select to anon, authenticated
   using (true);
@@ -351,9 +332,9 @@ create policy "Admins can manage site settings"
   on public.site_settings for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
 
-grant select on public.properties, public.property_images, public.faqs, public.team_members, public.reviews, public.site_settings to anon, authenticated;
+grant select on public.properties, public.property_images, public.faqs, public.team_members, public.site_settings to anon, authenticated;
 grant insert on public.valuation_requests, public.contact_requests, public.property_alerts to anon, authenticated;
-grant select, insert, update, delete on public.properties, public.property_images, public.faqs, public.team_members, public.reviews, public.site_settings, public.valuation_requests, public.contact_requests, public.property_alerts to authenticated;
+grant select, insert, update, delete on public.properties, public.property_images, public.faqs, public.team_members, public.site_settings, public.valuation_requests, public.contact_requests, public.property_alerts to authenticated;
 grant select on public.admin_profiles to authenticated;
 grant select, update on public.property_notification_queue to authenticated;
 grant select on public.property_alert_deliveries to authenticated;

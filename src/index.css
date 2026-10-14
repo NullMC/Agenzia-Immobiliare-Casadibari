@@ -3953,3 +3953,38 @@ h4 {
     margin-left: auto;
   }
 }
+
+
+/* Third-party reviews widget (Elfsight) */
+.elfsight-reviews-shell {
+  width: 100%;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.elfsight-reviews-shell > div {
+  width: 100%;
+  min-width: 0;
+}
+
+.elfsight-reviews-placeholder {
+  display: flex;
+  align-items: center;
+  min-height: 190px;
+  padding: 24px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.review-widget-panel {
+  min-width: 0;
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+}
