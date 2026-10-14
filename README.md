@@ -10,7 +10,7 @@ Requisiti: Node.js 20+ e npm.
 2. Copia `.env.example` in `.env.local`.
 3. Inserisci `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env.local` usando la chiave publishable del progetto.
 4. Imposta `VITE_ELFSIGHT_REVIEWS_WIDGET_ID` con l’ID del widget Elfsight (la parte dopo `elfsight-app-` nel codice di incorporamento).
-4. Avvia con `npm run dev`; verifica con `npm run build`.
+5. Avvia con `npm run dev`; verifica con `npm run build`.
 
 Senza configurazione Supabase il sito non mostra annunci. Le sezioni immobili mostrano uno stato vuoto finché non sono disponibili record reali pubblicati nel database. Non sono incluse schede immobiliari di esempio.
 
@@ -40,7 +40,7 @@ La chiave anon è destinata al client e resta protetta dalle policy RLS. La serv
 
 ## Edge Functions: deploy e attivazione
 
-Le chiavi `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` configurano il front-end, ma **non distribuiscono le Edge Functions**.
+Le chiavi `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` configurano il front-end, ma **non distribuiscono le Edge Functions**.
 
 Apri un terminale nella cartella del repository, autentica la Supabase CLI, identifica il progetto e collegalo:
 
