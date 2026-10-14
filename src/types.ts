@@ -78,16 +78,6 @@ export interface TeamMember {
   sort_order: number;
 }
 
-export interface Review {
-  id: string;
-  author_name: string;
-  rating: number;
-  content: string;
-  source: string;
-  approved: boolean;
-  sort_order: number;
-}
-
 export const demoFaqs: Faq[] = [
   { id: 'faq-1', question: 'Come posso richiedere una valutazione del mio immobile?', answer: 'Compila il modulo di valutazione con indirizzo, tipologia e metratura. Ti ricontatteremo per approfondire le caratteristiche dell’immobile.', published: true, sort_order: 1 },
   { id: 'faq-2', question: 'Come posso visitare un immobile?', answer: 'Apri la scheda dell’immobile e contattaci per concordare un appuntamento.', published: true, sort_order: 2 },
