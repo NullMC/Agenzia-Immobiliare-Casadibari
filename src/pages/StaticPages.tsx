@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@mui/material';
-import { ArrowRight, BadgeCheck, CheckCircle2, Clock3, Handshake, Home, Landmark, Mail, MapPin, Phone, ShieldCheck, Star, Users } from 'lucide-react';
+import { ArrowRight, BadgeCheck, CheckCircle2, Clock3, Handshake, Home, Landmark, Mail, MapPin, Phone, ShieldCheck, Users } from 'lucide-react';
 import Seo from '../components/Seo';
+import ElfsightReviews from '../components/ElfsightReviews';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
-import { demoFaqs, type ContactSettings, type Faq, type Review, type TeamMember } from '../types';
+import { type ContactSettings, type TeamMember } from '../types';
 
 const defaultContact: ContactSettings = {
   businessName: 'Casadibari Immobiliare sas di Casadibari Maurizio & C',
@@ -20,17 +21,14 @@ function PageHero({ eyebrow, title, description }: { eyebrow: string; title: str
 
 export function AboutPage() {
   const [team, setTeam] = useState<TeamMember[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
   const [contact, setContact] = useState<ContactSettings>(defaultContact);
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     Promise.all([
       supabase.from('team_members').select('*').eq('active', true).order('sort_order'),
-      supabase.from('reviews').select('*').eq('approved', true).order('sort_order'),
       supabase.from('site_settings').select('value').eq('key', 'contact').maybeSingle()
-    ]).then(([teamResult, reviewsResult, settingsResult]) => {
+    ]).then(([teamResult, settingsResult]) => {
       if (!teamResult.error) setTeam((teamResult.data || []) as TeamMember[]);
-      if (!reviewsResult.error) setReviews((reviewsResult.data || []) as Review[]);
       if (settingsResult.data?.value) setContact({ ...defaultContact, ...(settingsResult.data.value as ContactSettings) });
     });
   }, []);
@@ -41,7 +39,7 @@ export function AboutPage() {
     <section className="section"><div className="container about-intro-grid"><div><span className="eyebrow">Agenzia Immobiliare Casadibari</span><h2>Il tuo Partner di fiducia <span>nel mondo immobiliare.</span></h2><p>Benvenuti nell’Agenzia Casadibari Immobiliare sas, dove la passione per il settore immobiliare si unisce a una lunga esperienza al servizio della comunità.</p><p>Dal 2001 lavoriamo per aiutare le persone a trovare un luogo accogliente da chiamare “la mia casa”. Nel corso degli anni abbiamo costruito il nostro percorso dando valore all’affidabilità, alla competenza e alla dedizione verso chi ci sceglie.</p><p>Ogni situazione è diversa. Per questo mettiamo al centro l’ascolto e la chiarezza: dall’idea iniziale alla visita, dalla valutazione alla conclusione della trattativa.</p><Button component={Link} to="/contatti" variant="contained" endIcon={<ArrowRight size={17} />}>Conosciamoci</Button></div><div className="about-photo"><img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85" alt="Interni contemporanei e luminosi" loading="lazy" /><div className="about-photo__caption"><strong>Dal 2001</strong><span>al fianco di chi cerca casa</span></div></div></div></section>
     <section className="section section--soft"><div className="container"><div className="section-heading section-heading--center"><div><span className="eyebrow">I nostri valori</span><h2>Una guida concreta, mai distante.</h2><p>La qualità del percorso conta quanto il risultato.</p></div></div><div className="value-grid"><article><span><ShieldCheck size={23} /></span><h3>Trasparenza</h3><p>Informazioni chiare e dialogo diretto in ogni fase.</p></article><article><span><Handshake size={23} /></span><h3>Ascolto</h3><p>Partiamo dalle tue esigenze per individuare un percorso adatto.</p></article><article><span><BadgeCheck size={23} /></span><h3>Esperienza</h3><p>Una presenza radicata a Bari e una conoscenza costruita nel tempo.</p></article></div></div></section>
     {team.length > 0 && <section className="section"><div className="container"><div className="section-heading"><div><span className="eyebrow">Le persone</span><h2>Il nostro team</h2><p>Le persone che ti accompagneranno nel tuo percorso.</p></div></div><div className="team-grid">{team.map(member => <article className="team-card" key={member.id}>{member.photo_url ? <img src={member.photo_url} alt={member.full_name} loading="lazy" /> : <div className="team-card__initials">{member.full_name.split(' ').map(part => part[0]).slice(0,2).join('')}</div>}<h3>{member.full_name}</h3><span>{member.role}</span>{member.bio && <p>{member.bio}</p>}</article>)}</div></div></section>}
-    <section className="section" id="recensioni"><div className="container"><div className="section-heading"><div><span className="eyebrow">Le esperienze dei clienti</span><h2>Le parole che ci fanno crescere</h2><p>Le recensioni pubblicate sono gestite dall’agenzia per mantenere aggiornato questo spazio.</p></div></div>{reviews.length ? <div className="review-cards review-cards--light">{reviews.map(review => <article key={review.id} className="review-card"><div className="review-stars">{Array.from({length:review.rating}).map((_,i)=><Star size={15} key={i} fill="currentColor" />)}</div><p>“{review.content}”</p><strong>{review.author_name}</strong>{review.source && <small>{review.source}</small>}</article>)}</div> : <div className="review-placeholder"><Star size={22} /><div><strong>Recensioni in aggiornamento</strong><p>Lo spazio è predisposto per mostrare le recensioni approvate dall’agenzia.</p></div></div>}</div></section>
+    <section className="section" id="recensioni"><div className="container"><div className="section-heading"><div><span className="eyebrow">Le esperienze dei clienti</span><h2>Le parole che ci fanno crescere</h2><p>Leggi le recensioni dei clienti tramite il widget Elfsight.</p></div></div><ElfsightReviews /></div></section>
     <section className="section section--soft"><div className="container office-grid"><div><span className="eyebrow">Vieni a trovarci</span><h2>Ci trovi a Bari, in via Pasubio.</h2><p>Siamo felici di incontrarti per ascoltare le tue esigenze e parlare del tuo progetto immobiliare.</p><p className="office-contact"><MapPin size={18} /> {contact.address}</p>{contact.phone && <p className="office-contact"><Phone size={18} /> <a href={'tel:' + contact.phone.replace(/[^+\d]/g,'')}>{contact.phone}</a></p>}{contact.email && <p className="office-contact"><Mail size={18} /> <a href={'mailto:' + contact.email}>{contact.email}</a></p>}<Link className="button button--primary" to="/contatti">Scrivici <ArrowRight size={17} /></Link></div><div className="office-map"><iframe title="Mappa ufficio Casadibari Immobiliare" src={contact.mapsEmbedUrl || defaultContact.mapsEmbedUrl} loading="lazy" referrerPolicy="no-referrer-when-downgrade" /></div></div></section>
   </>;
 }
@@ -108,21 +106,6 @@ export function PublishPage() {
     <PageHero eyebrow="Pubblica con noi" title="Il tuo immobile merita la giusta attenzione." description="Conosciamo il territorio e possiamo aiutarti a valorizzare i punti di forza della tua proprietà con un percorso condiviso." />
     <section className="section"><div className="container publish-layout"><div><span className="eyebrow">Dalla prima chiacchierata alla pubblicazione</span><h2>Un percorso pensato per il tuo immobile.</h2><div className="process-list"><div><span>01</span><div><strong>Ascoltiamo la tua esigenza</strong><p>Ci racconti il tuo obiettivo, i tempi e le caratteristiche dell’immobile.</p></div></div><div><span>02</span><div><strong>Prepariamo la presentazione</strong><p>Raccogliamo informazioni, caratteristiche e materiali necessari a raccontarlo in modo chiaro.</p></div></div><div><span>03</span><div><strong>Definiamo la promozione</strong><p>Concordiamo insieme canali, tempistiche e attività di pubblicizzazione disponibili.</p></div></div></div><div className="platforms-note"><strong>Canali di pubblicazione</strong><p>Le piattaforme e i canali promozionali specifici sono da inserire e confermare manualmente dall’agenzia prima del lancio.</p></div></div>
       <form className="form-card" onSubmit={submit}><div className="form-card__heading"><span className="form-card__icon"><Home size={22} /></span><div><h2>Parliamo del tuo immobile</h2><p>Lasciaci un recapito, ti ricontatteremo.</p></div></div><label className="field"><span>Nome e cognome *</span><input required value={form.name} onChange={e => update('name', e.target.value)} /></label><label className="field"><span>Email *</span><input type="email" required value={form.email} onChange={e => update('email', e.target.value)} /></label><label className="field"><span>Telefono</span><input type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} /></label><label className="field"><span>Come possiamo aiutarti? *</span><textarea rows={5} required value={form.message} onChange={e => update('message', e.target.value)} placeholder="Zona, tipologia di immobile, vendita o affitto…" /></label><label className="check-field"><input type="checkbox" checked={form.privacy_consent} onChange={e => update('privacy_consent', e.target.checked)} /><span>Acconsento al trattamento dei dati per ricevere risposta alla richiesta. *</span></label><Button variant="contained" fullWidth disabled={sending} type="submit" endIcon={<ArrowRight size={17} />}>{sending ? 'Invio…' : 'Invia la richiesta'}</Button>{status && <p className="form-feedback" role="status">{status}</p>}</form></div></section>
-  </>;
-}
-
-export function FaqPage() {
-  const [faqs, setFaqs] = useState<Faq[]>(isSupabaseConfigured ? [] : demoFaqs);
-  useEffect(() => {
-    if (!isSupabaseConfigured) return;
-    supabase.from('faqs').select('*').eq('published', true).order('sort_order').then(({ data, error }) => {
-      if (!error) setFaqs((data || []) as Faq[]);
-    });
-  }, []);
-  return <>
-    <Seo title="Domande frequenti | Casadibari Immobiliare" description="Risposte alle domande più frequenti sulla ricerca degli immobili, le valutazioni, le visite e gli avvisi email Casadibari." path="/faq" />
-    <PageHero eyebrow="Siamo qui per aiutarti" title="Domande frequenti" description="Le prime risposte per orientarti nel tuo percorso immobiliare." />
-    <section className="section"><div className="container faq-layout"><div><span className="eyebrow">Le risposte che cerchi</span><h2>Dubbi? Partiamo da qui.</h2><p>Se non trovi l’informazione di cui hai bisogno, contattaci: saremo felici di approfondire.</p><Button component={Link} to="/contatti" variant="outlined" endIcon={<ArrowRight size={16} />}>Fai una domanda</Button></div><div className="faq-list">{faqs.map((faq, index) => <details className="faq-item" key={faq.id} open={index === 0}><summary><span>{faq.question}</span><span className="faq-plus">+</span></summary><p>{faq.answer}</p></details>)}{!faqs.length && <p>Le risposte sono in aggiornamento. Contattaci per informazioni.</p>}</div></div></section>
   </>;
 }
 
