@@ -3,7 +3,7 @@ import SiteLayout from './components/SiteLayout';
 import HomePage from './pages/HomePage';
 import PropertiesPage from './pages/PropertiesPage';
 import PropertyPage from './pages/PropertyPage';
-import { AboutPage, ContactPage, FaqPage, MortgagePage, PrivacyPage, PublishPage, ValuationPage } from './pages/StaticPages';
+import { AboutPage, ContactPage, MortgagePage, PrivacyPage, PublishPage, ValuationPage } from './pages/StaticPages';
 import AdminPage from './pages/AdminPage';
 
 export default function App() {
@@ -17,7 +17,6 @@ export default function App() {
         <Route path="/valutazione" element={<ValuationPage />} />
         <Route path="/consulenza-mutui" element={<MortgagePage />} />
         <Route path="/pubblica-con-noi" element={<PublishPage />} />
-        <Route path="/faq" element={<FaqPage />} />
         <Route path="/contatti" element={<ContactPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
       </Route>
