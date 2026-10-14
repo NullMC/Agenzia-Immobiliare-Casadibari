@@ -15,7 +15,7 @@ export const casadibariTheme = createTheme({
     background: { default: '#ffffff', paper: '#ffffff' },
     text: { primary: ink, secondary: muted },
     divider: border,
-    error: { main: '#c53b3b' }
+    error: { main: '#c53b3b' },
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica Neue", Arial, sans-serif',
@@ -25,7 +25,7 @@ export const casadibariTheme = createTheme({
     h3: { fontWeight: 700, letterSpacing: '-0.02em' },
     h4: { fontWeight: 700, letterSpacing: '-0.02em' },
     body1: { lineHeight: 1.7 },
-    body2: { lineHeight: 1.6 }
+    body2: { lineHeight: 1.6 },
   },
   shape: { borderRadius: 12 },
   spacing: 8,
@@ -34,53 +34,81 @@ export const casadibariTheme = createTheme({
       styleOverrides: {
         html: { scrollBehavior: 'smooth', WebkitFontSmoothing: 'antialiased' },
         body: { minWidth: 320, color: ink, backgroundColor: '#fff' },
-        '::selection': { backgroundColor: alpha(green, 0.2) }
-      }
+        '::selection': { backgroundColor: alpha(green, 0.2) },
+      },
     },
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { borderRadius: 9, minHeight: 42, padding: '10px 18px', fontWeight: 700, textTransform: 'none', gap: 6, transition: 'transform .18s ease, background-color .18s ease' },
-        containedPrimary: { backgroundColor: green, '&:hover': { backgroundColor: greenDark, transform: 'translateY(-1px)' } },
-        outlinedPrimary: { borderColor: alpha(green, 0.35), '&:hover': { borderColor: green, backgroundColor: alpha(green, 0.05) } },
+        root: {
+          borderRadius: 9,
+          minHeight: 42,
+          padding: '10px 18px',
+          fontWeight: 700,
+          textTransform: 'none',
+          gap: 6,
+          transition: 'transform .18s ease, background-color .18s ease',
+        },
+        containedPrimary: {
+          backgroundColor: green,
+          '&:hover': { backgroundColor: greenDark, transform: 'translateY(-1px)' },
+        },
+        outlinedPrimary: {
+          borderColor: alpha(green, 0.35),
+          '&:hover': { borderColor: green, backgroundColor: alpha(green, 0.05) },
+        },
         sizeSmall: { minHeight: 34, padding: '6px 12px' },
-        sizeLarge: { minHeight: 50, padding: '13px 22px' }
-      }
+        sizeLarge: { minHeight: 50, padding: '13px 22px' },
+      },
     },
     MuiIconButton: {
       styleOverrides: {
         root: { borderRadius: 10, '&:hover': { backgroundColor: alpha(green, 0.09) } },
-        colorPrimary: { color: greenDark }
-      }
+        colorPrimary: { color: greenDark },
+      },
     },
     MuiCard: {
       styleOverrides: {
-        root: { border: '1px solid ' + border, borderRadius: 16, boxShadow: '0 7px 24px rgba(22, 44, 26, 0.045)', backgroundImage: 'none' }
-      }
+        root: {
+          border: '1px solid ' + border,
+          borderRadius: 16,
+          boxShadow: '0 7px 24px rgba(22, 44, 26, 0.045)',
+          backgroundImage: 'none',
+        },
+      },
     },
     MuiPaper: {
       styleOverrides: {
         rounded: { borderRadius: 16 },
-        outlined: { borderColor: border }
-      }
+        outlined: { borderColor: border },
+      },
     },
     MuiTextField: {
-      defaultProps: { size: 'small', fullWidth: true, variant: 'outlined' }
+      defaultProps: { size: 'small', fullWidth: true, variant: 'outlined' },
     },
     MuiOutlinedInput: {
       styleOverrides: {
-        root: { borderRadius: 9, backgroundColor: '#fff', '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(green, 0.65) }, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderWidth: 2, borderColor: green } },
-        notchedOutline: { borderColor: '#d6dfd6' }
-      }
+        root: {
+          borderRadius: 9,
+          backgroundColor: '#fff',
+          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: alpha(green, 0.65) },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderWidth: 2, borderColor: green },
+        },
+        notchedOutline: { borderColor: '#d6dfd6' },
+      },
     },
-    MuiInputLabel: { styleOverrides: { root: { color: muted, '&.Mui-focused': { color: greenDark } } } },
+    MuiInputLabel: {
+      styleOverrides: { root: { color: muted, '&.Mui-focused': { color: greenDark } } },
+    },
     MuiChip: {
       styleOverrides: {
         root: { borderRadius: 7, fontWeight: 700 },
-        colorSuccess: { backgroundColor: '#e7f6e9', color: greenDark }
-      }
+        colorSuccess: { backgroundColor: '#e7f6e9', color: greenDark },
+      },
     },
     MuiAlert: { styleOverrides: { root: { borderRadius: 10, alignItems: 'center' } } },
-    MuiTableCell: { styleOverrides: { head: { color: muted, fontWeight: 700, backgroundColor: '#f7faf7' } } }
-  }
+    MuiTableCell: {
+      styleOverrides: { head: { color: muted, fontWeight: 700, backgroundColor: '#f7faf7' } },
+    },
+  },
 });

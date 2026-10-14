@@ -89,8 +89,35 @@ export interface Review {
 }
 
 export const demoFaqs: Faq[] = [
-  { id: 'faq-1', question: 'Come posso richiedere una valutazione del mio immobile?', answer: 'Compila il modulo di valutazione con indirizzo, tipologia e metratura. Ti ricontatteremo per approfondire le caratteristiche dell’immobile.', published: true, sort_order: 1 },
-  { id: 'faq-2', question: 'Come posso visitare un immobile?', answer: 'Apri la scheda dell’immobile e contattaci per concordare un appuntamento.', published: true, sort_order: 2 },
-  { id: 'faq-3', question: 'Posso ricevere nuovi annunci via email?', answer: 'Sì. Nella pagina Immobili puoi salvare le tue preferenze e ricevere via email proposte pertinenti quando vengono pubblicate nuove disponibilità.', published: true, sort_order: 3 },
-  { id: 'faq-4', question: 'Offrite consulenza per mutui e prestiti?', answer: 'Puoi richiedere un primo contatto per essere indirizzato a referenti e consulenti. Condizioni e approvazione restano in capo agli enti eroganti.', published: true, sort_order: 4 }
+  {
+    id: 'faq-1',
+    question: 'Come posso richiedere una valutazione del mio immobile?',
+    answer:
+      'Compila il modulo di valutazione con indirizzo, tipologia e metratura. Ti ricontatteremo per approfondire le caratteristiche dell’immobile.',
+    published: true,
+    sort_order: 1,
+  },
+  {
+    id: 'faq-2',
+    question: 'Come posso visitare un immobile?',
+    answer: 'Apri la scheda dell’immobile e contattaci per concordare un appuntamento.',
+    published: true,
+    sort_order: 2,
+  },
+  {
+    id: 'faq-3',
+    question: 'Posso ricevere nuovi annunci via email?',
+    answer:
+      'Sì. Nella pagina Immobili puoi salvare le tue preferenze e ricevere via email proposte pertinenti quando vengono pubblicate nuove disponibilità.',
+    published: true,
+    sort_order: 3,
+  },
+  {
+    id: 'faq-4',
+    question: 'Offrite consulenza per mutui e prestiti?',
+    answer:
+      'Puoi richiedere un primo contatto per essere indirizzato a referenti e consulenti. Condizioni e approvazione restano in capo agli enti eroganti.',
+    published: true,
+    sort_order: 4,
+  },
 ];

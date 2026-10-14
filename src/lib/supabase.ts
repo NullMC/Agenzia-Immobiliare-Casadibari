@@ -17,9 +17,9 @@ export const supabase = createClient(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      storageKey: 'casadibari-auth'
-    }
-  }
+      storageKey: 'casadibari-auth',
+    },
+  },
 );
 
 export function publicSiteUrl(): string {
