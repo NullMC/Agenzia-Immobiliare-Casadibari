@@ -307,7 +307,7 @@ export default function AdminPage() {
     event.preventDefault();
     setLoginError('');
     if (!isSupabaseConfigured) {
-      setLoginError('Configura prima VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.');
+      setLoginError('Configura prima VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY.');
       return;
     }
     setLoginBusy(true);
