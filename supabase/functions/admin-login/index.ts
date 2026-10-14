@@ -11,15 +11,50 @@ function response(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: corsHeaders });
 }
 
+/**
+ * Supabase's current hosted Edge Functions expose named API-key dictionaries.
+ * Older projects may still expose the legacy ANON/SERVICE_ROLE variables.
+ */
+function readNamedKey(variable: string): string | undefined {
+  const value = Deno.env.get(variable);
+  if (!value) return undefined;
+
+  try {
+    const parsed = JSON.parse(value) as Record<string, unknown>;
+    const defaultKey = parsed.default;
+    if (typeof defaultKey === 'string' && defaultKey.trim()) return defaultKey.trim();
+
+    const firstKey = Object.values(parsed).find(
+      (item): item is string => typeof item === 'string' && item.trim().length > 0,
+    );
+    if (firstKey) return firstKey.trim();
+  } catch {
+    // Ignore non-JSON values; singular variables and legacy names are checked separately.
+  }
+  return undefined;
+}
+
+function readSupabaseKeys() {
+  const url = Deno.env.get('SUPABASE_URL');
+  const publishableKey =
+    Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ||
+    readNamedKey('SUPABASE_PUBLISHABLE_KEYS') ||
+    Deno.env.get('SUPABASE_ANON_KEY');
+  const secretKey =
+    Deno.env.get('SUPABASE_SECRET_KEY') ||
+    readNamedKey('SUPABASE_SECRET_KEYS') ||
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+  return { url, publishableKey, secretKey };
+}
+
 Deno.serve(async (request: Request) => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (request.method !== 'POST') return response({ error: 'Metodo non consentito.' }, 405);
 
-  const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  const { url: supabaseUrl, publishableKey: anonKey, secretKey: serviceKey } = readSupabaseKeys();
   if (!supabaseUrl || !anonKey || !serviceKey)
-    return response({ error: 'Servizio di autenticazione non configurato.' }, 500);
+    return response({ error: 'Servizio di autenticazione non configurato: verifica le chiavi API disponibili per la Edge Function.' }, 500);
 
   let payload: { username?: string; password?: string };
   try {
