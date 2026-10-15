@@ -62,14 +62,16 @@ npx supabase functions list
 
 Le Edge Functions Supabase possono ricevere `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` e `SUPABASE_SECRET_KEYS` (dizionari JSON nominati), oltre alle variabili legacy `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY`. La funzione `admin-login` legge i nomi nuovi e quelli legacy. Non inserire mai chiavi secret/service role nel bundle React e non creare Function Secrets personalizzati con prefisso riservato `SUPABASE_`.
 
-Per l'invio email, imposta nei **Project Settings → Edge Functions → Secrets** (oppure con `npx supabase secrets set`) questi segreti personalizzati:
+Per inviare email ai clienti, crea in Resend un dominio di invio dedicato, preferibilmente un sottodominio come `send.casadibari.it`, e verifica i record DNS che Resend mostra per quel sottodominio. Non è necessario creare una nuova casella di posta: il sottodominio serve solo a separare l'autenticazione dell'invio dal dominio principale. Lascia invariati i record MX del dominio principale usati per ricevere la posta dell'ufficio. Usa come mittente un indirizzo del sottodominio verificato, ad esempio `Casadibari Immobiliare <notifiche@send.casadibari.it>`.
 
-- `RESEND_API_KEY`: chiave API Resend.
-- `RESEND_FROM_EMAIL`: mittente autorizzato/verificato su Resend, ad esempio `Casadibari Immobiliare <immobili@tuodominio.it>`.
+Poi imposta in **Project Settings → Edge Functions → Secrets** (oppure con `npx supabase secrets set`) questi segreti personalizzati:
+
+- `RESEND_API_KEY`: la chiave API Resend.
+- `RESEND_FROM_EMAIL`: il mittente sul sottodominio verificato, ad esempio `Casadibari Immobiliare <notifiche@send.casadibari.it>`.
 - `SITE_URL`: URL pubblico canonico del sito, senza slash finale; usato nei link agli annunci.
-- `NOTIFICATION_WEBHOOK_SECRET`: stringa casuale lunga, privata, usata identica nell'header `x-hook-secret` del webhook per gli avvisi ai clienti.
+- `NOTIFICATION_WEBHOOK_SECRET`: stringa casuale lunga, privata, usata identica nell'header `x-hook-secret` del webhook degli avvisi.
 
-Non aggiungere queste credenziali al front-end e non salvarle in GitHub. La funzione invia email soltanto ai clienti che hanno salvato una ricerca attiva e dato il consenso, quando un nuovo immobile disponibile corrisponde ai loro criteri. Le richieste di contatto e valutazione vengono salvate in Supabase e consultabili dal backoffice; non viene inviata una email alla casella dell'ufficio.
+Non aggiungere queste credenziali al front-end e non salvarle in GitHub. Le email vengono inviate esclusivamente ai clienti che hanno salvato una ricerca attiva e dato il consenso, quando un nuovo immobile disponibile corrisponde ai loro criteri. I moduli di Contatto e Valutazione restano salvati in Supabase e sono consultabili dal backoffice; non è previsto l'invio di email alla casella dell'ufficio.
 
 Per completare il login amministratore, crea prima un utente in **Authentication → Users**, poi inserisci il suo UUID, uno username minuscolo e la stessa email in `public.admin_profiles` (vedi query SQL nella sezione precedente).
 
