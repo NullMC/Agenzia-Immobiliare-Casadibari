@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { Facebook, Instagram, Mail, MapPin, Menu, Phone, X } from 'lucide-react';
+import { ArrowUpRight, Facebook, Instagram, Mail, MapPin, Menu, MessageCircle, Phone, X } from 'lucide-react';
 import { Button, IconButton } from '@mui/material';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import type { ContactSettings } from '../types';
@@ -11,11 +11,13 @@ const defaultContact: ContactSettings = {
   address: 'Via Pasubio, 78A, 70125 Bari BA',
   phone: '080 849 1745',
   email: 'info@casadibari.it',
+  whatsapp: '393338510522',
   mapsEmbedUrl: 'https://www.google.com/maps?q=Via%20Pasubio%2078A%20Bari&output=embed',
 };
 
 export default function SiteLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [contactMenuOpen, setContactMenuOpen] = useState(false);
   const [contact, setContact] = useState<ContactSettings>(defaultContact);
 
   useEffect(() => {
@@ -31,11 +33,22 @@ export default function SiteLayout() {
           setContact({
             ...defaultContact,
             ...savedContact,
+            phone: savedContact.phone?.trim() || defaultContact.phone,
             email: savedContact.email?.trim() || defaultContact.email,
+            whatsapp: savedContact.whatsapp?.replace(/\D/g, '') || defaultContact.whatsapp,
           });
         }
       });
   }, []);
+
+  useEffect(() => {
+    if (!contactMenuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setContactMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [contactMenuOpen]);
 
   const navItems = [
     { to: '/', label: 'Home', end: true },
@@ -45,9 +58,12 @@ export default function SiteLayout() {
     { to: '/consulenza-mutui', label: 'Mutui e prestiti' },
   ];
   const closeMenu = () => setMenuOpen(false);
-  const tel = contact.phone ? 'tel:' + contact.phone.replace(/[^+\d]/g, '') : undefined;
+  const publicPhone = contact.phone?.trim() || defaultContact.phone || '';
+  const publicEmail = contact.email?.trim() || defaultContact.email || '';
+  const tel = publicPhone ? 'tel:' + publicPhone.replace(/[^+\d]/g, '') : undefined;
   const mobileTel = contact.mobile ? 'tel:' + contact.mobile.replace(/[^+\d]/g, '') : undefined;
-  const whatsappNumber = (contact.whatsapp || '').replace(/\D/g, '');
+  const whatsappNumber = (contact.whatsapp || defaultContact.whatsapp || '').replace(/\D/g, '');
+  const closeContactMenu = () => setContactMenuOpen(false);
 
   return (
     <div className="app-shell">
@@ -62,9 +78,9 @@ export default function SiteLayout() {
                 <Phone size={13} /> {contact.phone}
               </a>
             )}
-            {contact.email && (
-              <a href={'mailto:' + contact.email}>
-                <Mail size={13} /> {contact.email}
+            {publicEmail && (
+              <a href={'mailto:' + publicEmail}>
+                <Mail size={13} /> {publicEmail}
               </a>
             )}
           </div>
@@ -178,9 +194,9 @@ export default function SiteLayout() {
                 <Phone size={16} /> {contact.mobile}
               </a>
             )}
-            {contact.email && (
-              <a href={'mailto:' + contact.email}>
-                <Mail size={16} /> {contact.email}
+            {publicEmail && (
+              <a href={'mailto:' + publicEmail}>
+                <Mail size={16} /> {publicEmail}
               </a>
             )}
             {contact.pec && (
@@ -226,17 +242,64 @@ export default function SiteLayout() {
           </div>
         </div>
       </footer>
-      {whatsappNumber && (
-        <a
-          className="whatsapp-float"
-          href={'https://wa.me/' + whatsappNumber}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Contattaci su WhatsApp"
+      <div className={'contact-radial' + (contactMenuOpen ? ' is-open' : '')}>
+        <div
+          className="contact-radial__actions"
+          id="contact-radial-actions"
+          aria-hidden={!contactMenuOpen}
         >
-          WA
-        </a>
-      )}
+          <a
+            className="contact-radial__action contact-radial__action--whatsapp"
+            href={'https://wa.me/' + whatsappNumber}
+            target="_blank"
+            rel="noreferrer"
+            onClick={closeContactMenu}
+            tabIndex={contactMenuOpen ? 0 : -1}
+          >
+            <MessageCircle size={19} aria-hidden="true" />
+            <span>WhatsApp</span>
+          </a>
+          {tel && (
+            <a
+              className="contact-radial__action contact-radial__action--phone"
+              href={tel}
+              onClick={closeContactMenu}
+              tabIndex={contactMenuOpen ? 0 : -1}
+            >
+              <Phone size={18} aria-hidden="true" />
+              <span>Chiama l’agenzia</span>
+            </a>
+          )}
+          <a
+            className="contact-radial__action contact-radial__action--email"
+            href={'mailto:' + publicEmail}
+            onClick={closeContactMenu}
+            tabIndex={contactMenuOpen ? 0 : -1}
+          >
+            <Mail size={18} aria-hidden="true" />
+            <span>Email</span>
+          </a>
+          <Link
+            className="contact-radial__action contact-radial__action--form"
+            to="/contatti"
+            onClick={closeContactMenu}
+            tabIndex={contactMenuOpen ? 0 : -1}
+          >
+            <ArrowUpRight size={18} aria-hidden="true" />
+            <span>Modulo contatti</span>
+          </Link>
+        </div>
+        <button
+          className="contact-radial__toggle"
+          type="button"
+          aria-label={contactMenuOpen ? 'Chiudi il menu contatti' : 'Apri il menu contatti'}
+          aria-expanded={contactMenuOpen}
+          aria-controls="contact-radial-actions"
+          onClick={() => setContactMenuOpen((open) => !open)}
+        >
+          {contactMenuOpen ? <X size={24} /> : <MessageCircle size={25} />}
+        </button>
+      </div>
     </div>
   );
 }
