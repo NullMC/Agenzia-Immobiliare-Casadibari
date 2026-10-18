@@ -25,6 +25,7 @@ const defaultContact: ContactSettings = {
   vatNumber: '08451090727',
   address: 'Via Pasubio, 78A, 70125 Bari BA',
   phone: '080 849 1745',
+  email: 'info@casadibari.it',
   mapsEmbedUrl: 'https://www.google.com/maps?q=Via%20Pasubio%2078A%20Bari&output=embed',
 };
 
@@ -58,8 +59,14 @@ export function AboutPage() {
       supabase.from('site_settings').select('value').eq('key', 'contact').maybeSingle(),
     ]).then(([teamResult, settingsResult]) => {
       if (!teamResult.error) setTeam((teamResult.data || []) as TeamMember[]);
-      if (settingsResult.data?.value)
-        setContact({ ...defaultContact, ...(settingsResult.data.value as ContactSettings) });
+      if (settingsResult.data?.value) {
+        const savedContact = settingsResult.data.value as ContactSettings;
+        setContact({
+          ...defaultContact,
+          ...savedContact,
+          email: savedContact.email?.trim() || defaultContact.email,
+        });
+      }
     });
   }, []);
 
@@ -702,7 +709,14 @@ export function ContactPage() {
         .eq('key', 'contact')
         .maybeSingle()
         .then(({ data }) => {
-          if (data?.value) setContact({ ...defaultContact, ...(data.value as ContactSettings) });
+          if (data?.value) {
+            const savedContact = data.value as ContactSettings;
+            setContact({
+              ...defaultContact,
+              ...savedContact,
+              email: savedContact.email?.trim() || defaultContact.email,
+            });
+          }
         });
   }, []);
   const update = (key: keyof typeof form, value: string | boolean) =>
