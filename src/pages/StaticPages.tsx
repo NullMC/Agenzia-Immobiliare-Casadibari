@@ -914,8 +914,8 @@ export function PrivacyPage() {
           <h2>Titolare del trattamento</h2>
           <p>
             Casadibari Immobiliare sas di Casadibari Maurizio &amp; C, con sede in Via Pasubio 78A,
-            70125 Bari. P. IVA 08451090727. I recapiti email e PEC devono essere completati nella
-            sezione Contatti.
+            70125 Bari. P. IVA 08451090727. Per i contatti via email puoi scrivere a
+            info@casadibari.it. Il recapito PEC sarà indicato solo dopo la sua conferma ufficiale.
           </p>
           <h2>Quali dati raccogliamo</h2>
           <p>
