@@ -112,7 +112,7 @@ const blankContact: ContactSettings = {
   address: 'Via Pasubio, 78A, 70125 Bari BA',
   phone: '080 849 1745',
   mobile: '',
-  whatsapp: '',
+  whatsapp: '393338510522',
   email: 'info@casadibari.it',
   pec: '',
   instagram: '',
@@ -282,7 +282,9 @@ export default function AdminPage() {
       setContactSettings({
         ...blankContact,
         ...savedContact,
+        phone: savedContact.phone?.trim() || blankContact.phone,
         email: savedContact.email?.trim() || blankContact.email,
+        whatsapp: savedContact.whatsapp?.replace(/\D/g, '') || blankContact.whatsapp,
       });
     }
     setDataLoading(false);
@@ -1610,13 +1612,13 @@ export default function AdminPage() {
                     />
                   </label>
                   <label className="field">
-                    <span>Numero WhatsApp internazionale</span>
+                    <span>Numero WhatsApp (prefisso internazionale)</span>
                     <input
                       value={contactSettings.whatsapp || ''}
                       onChange={(e) =>
                         setContactSettings((current) => ({ ...current, whatsapp: e.target.value }))
                       }
-                      placeholder="Es. 393331234567"
+                      placeholder="393338510522"
                     />
                   </label>
                   <label className="field field--wide">
@@ -1700,7 +1702,7 @@ export default function AdminPage() {
                   </label>
                 </div>
                 <div className="admin-form-footer">
-                  <p>L’email pubblica predefinita è info@casadibari.it; la PEC viene mostrata solo se compilata.</p>
+                  <p>Email pubblica predefinita: info@casadibari.it. WhatsApp: +39 333 851 0522. La PEC viene mostrata solo se compilata.</p>
                   <Button
                     variant="contained"
                     size="large"
