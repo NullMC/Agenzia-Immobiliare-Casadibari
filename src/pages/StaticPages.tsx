@@ -26,6 +26,7 @@ const defaultContact: ContactSettings = {
   address: 'Via Pasubio, 78A, 70125 Bari BA',
   phone: '080 849 1745',
   email: 'info@casadibari.it',
+  whatsapp: '393338510522',
   mapsEmbedUrl: 'https://www.google.com/maps?q=Via%20Pasubio%2078A%20Bari&output=embed',
 };
 
@@ -64,7 +65,9 @@ export function AboutPage() {
         setContact({
           ...defaultContact,
           ...savedContact,
+          phone: savedContact.phone?.trim() || defaultContact.phone,
           email: savedContact.email?.trim() || defaultContact.email,
+          whatsapp: savedContact.whatsapp?.replace(/\D/g, '') || defaultContact.whatsapp,
         });
       }
     });
@@ -714,7 +717,9 @@ export function ContactPage() {
             setContact({
               ...defaultContact,
               ...savedContact,
+              phone: savedContact.phone?.trim() || defaultContact.phone,
               email: savedContact.email?.trim() || defaultContact.email,
+              whatsapp: savedContact.whatsapp?.replace(/\D/g, '') || defaultContact.whatsapp,
             });
           }
         });
