@@ -615,9 +615,47 @@ export function PublishPage() {
             <div className="platforms-note">
               <strong>Canali di pubblicazione</strong>
               <p>
-                Le piattaforme e i canali promozionali specifici sono da inserire e confermare
-                manualmente dall’agenzia prima del lancio.
+                Il tuo immobile può essere promosso anche attraverso i principali portali
+                immobiliari: scopri i nostri profili ufficiali.
               </p>
+              <div className="platforms-note__links">
+                <a
+                  href="https://www.immobiliare.it/agenzie-immobiliari/131774/casadibari/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Apri il profilo Casadibari su Immobiliare.it in una nuova scheda"
+                >
+                  <span>Immobiliare.it</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a
+                  href="https://www.idealista.it/pro/casadibariagenziaimmobiliare/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Apri il profilo Casadibari su Idealista in una nuova scheda"
+                >
+                  <span>Idealista</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a
+                  href="https://www.casa.it/agenzie/casadibari-agenzia-immobiliare-1196055/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Apri il profilo Casadibari su Casa.it in una nuova scheda"
+                >
+                  <span>Casa.it</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+                <a
+                  href="https://www.trovacasa.it/agenzie-immobiliari/casadibari-immobiliare-tc-37466/annunci"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Apri gli annunci Casadibari su TrovaCasa in una nuova scheda"
+                >
+                  <span>TrovaCasa</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
             </div>
           </div>
           <form className="form-card" onSubmit={submit}>
