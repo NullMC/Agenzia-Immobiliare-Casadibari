@@ -1868,8 +1868,42 @@ h4 {
   font-size: 13px;
 }
 .platforms-note p {
-  margin: 6px 0 0;
+  margin: 6px 0 14px;
   font-size: 12px;
+}
+.platforms-note__links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+.platforms-note__links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #dceadc;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+.platforms-note__links a > span:last-child {
+  color: var(--brand-dark);
+  font-size: 16px;
+}
+.platforms-note__links a:hover {
+  transform: translateY(-1px);
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-dark);
 }
 .faq-layout {
   grid-template-columns: 0.7fr 1.3fr;
