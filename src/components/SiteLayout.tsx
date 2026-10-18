@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { ArrowUpRight, Facebook, Instagram, Mail, MapPin, Menu, MessageCircle, Phone, X } from 'lucide-react';
+import { Facebook, Instagram, Mail, MapPin, Menu, MessageCircle, Phone, X } from 'lucide-react';
 import { Button, IconButton } from '@mui/material';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import type { ContactSettings } from '../types';
@@ -253,41 +253,35 @@ export default function SiteLayout() {
             href={'https://wa.me/' + whatsappNumber}
             target="_blank"
             rel="noreferrer"
+            aria-label="Contatta l’agenzia su WhatsApp"
+            title="WhatsApp"
             onClick={closeContactMenu}
             tabIndex={contactMenuOpen ? 0 : -1}
           >
             <MessageCircle size={19} aria-hidden="true" />
-            <span>WhatsApp</span>
           </a>
           {tel && (
             <a
               className="contact-radial__action contact-radial__action--phone"
               href={tel}
+              aria-label="Chiama l’agenzia"
+              title="Chiama l’agenzia"
               onClick={closeContactMenu}
               tabIndex={contactMenuOpen ? 0 : -1}
             >
               <Phone size={18} aria-hidden="true" />
-              <span>Chiama l’agenzia</span>
             </a>
           )}
           <a
             className="contact-radial__action contact-radial__action--email"
             href={'mailto:' + publicEmail}
+            aria-label="Scrivi un’email all’agenzia"
+            title="Email"
             onClick={closeContactMenu}
             tabIndex={contactMenuOpen ? 0 : -1}
           >
             <Mail size={18} aria-hidden="true" />
-            <span>Email</span>
           </a>
-          <Link
-            className="contact-radial__action contact-radial__action--form"
-            to="/contatti"
-            onClick={closeContactMenu}
-            tabIndex={contactMenuOpen ? 0 : -1}
-          >
-            <ArrowUpRight size={18} aria-hidden="true" />
-            <span>Modulo contatti</span>
-          </Link>
         </div>
         <button
           className="contact-radial__toggle"
