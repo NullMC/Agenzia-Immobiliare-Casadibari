@@ -50,7 +50,7 @@ npx supabase projects list
 npx supabase link --project-ref TUO_PROJECT_REF
 ```
 
-Per un progetto nuovo, applica le migrazioni tramite `npx supabase db push` oppure segui le istruzioni SQL qui indicate. Se il database è già attivo, esegui `npx supabase db push` per applicare le migrazioni ancora pendenti, senza rieseguire alla cieca la migrazione iniziale. La migrazione `202610140001_remove_reviews_table_use_elfsight.sql` rimuove la tabella `reviews`, perché le recensioni sono gestite dal widget Elfsight. La migrazione `202610180001_set_official_agency_email.sql` imposta `info@casadibari.it` come email pubblica nelle impostazioni del sito, preservando gli altri recapiti. Puoi anche eseguire quest'ultima migrazione direttamente in SQL Editor.
+Per un progetto nuovo, applica le migrazioni tramite `npx supabase db push` oppure segui le istruzioni SQL qui indicate. Se il database è già attivo, esegui `npx supabase db push` per applicare le migrazioni ancora pendenti, senza rieseguire alla cieca la migrazione iniziale. La migrazione `202610140001_remove_reviews_table_use_elfsight.sql` rimuove la tabella `reviews`, perché le recensioni sono gestite dal widget Elfsight. La migrazione `202610180001_set_official_agency_email.sql` imposta `info@casadibari.it` come email pubblica nelle impostazioni del sito, preservando gli altri recapiti. La migrazione `202610180002_set_official_whatsapp.sql` imposta WhatsApp `+39 333 851 0522` come recapito ufficiale. Puoi applicare le migrazioni pendenti con `npx supabase db push` oppure eseguirle singolarmente in SQL Editor.
 
 Distribuisci le funzioni dal repository:
 
@@ -101,7 +101,7 @@ Pubblica poi un immobile disponibile compatibile con la ricerca di prova: il tri
 
 ## Contenuti e gestione
 
-Dal percorso `/admin` l'amministratore può gestire gli annunci (creazione, modifica, cancellazione, stato, prezzo, caratteristiche, foto, descrizione formattata e selezione “In evidenza”), le FAQ mostrate in home e le richieste ricevute. Le recensioni sono caricate tramite il widget Elfsight, non da Supabase. Le schede in evidenza appaiono in home; tutti gli immobili pubblicati sono raggiungibili dalla pagina Immobili e dalla ricerca. Le immagini sono caricate da locale sul bucket Supabase e scorrono in un carosello sulla scheda di dettaglio.
+Dal percorso `/admin` l'amministratore può gestire gli annunci (creazione, modifica, cancellazione, stato, prezzo, caratteristiche, foto, descrizione formattata e selezione “In evidenza”), le FAQ mostrate in home, le richieste ricevute e i recapiti pubblici. Il menu contatti flottante in basso a destra apre un ventaglio radiale con WhatsApp, telefono, email e modulo Contatti; WhatsApp ufficiale: +39 333 851 0522. Le recensioni sono caricate tramite il widget Elfsight, non da Supabase. Le schede in evidenza appaiono in home; tutti gli immobili pubblicati sono raggiungibili dalla pagina Immobili e dalla ricerca. Le immagini sono caricate da locale sul bucket Supabase e scorrono in un carosello sulla scheda di dettaglio.
 
 Per il primo accesso non esistono credenziali preimpostate: crea un utente Auth e il relativo record in `admin_profiles` come sopra. Le sessioni sono gestite da Supabase Auth e persistono tra gli accessi; il logout invalida la sessione locale.
 
