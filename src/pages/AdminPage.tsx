@@ -113,7 +113,7 @@ const blankContact: ContactSettings = {
   phone: '080 849 1745',
   mobile: '',
   whatsapp: '',
-  email: '',
+  email: 'info@casadibari.it',
   pec: '',
   instagram: '',
   facebook: '',
@@ -277,8 +277,14 @@ export default function AdminPage() {
         ),
       );
     if (teamResult.data) setTeam(teamResult.data as TeamMember[]);
-    if (settingResult.data?.value)
-      setContactSettings({ ...blankContact, ...(settingResult.data.value as ContactSettings) });
+    if (settingResult.data?.value) {
+      const savedContact = settingResult.data.value as ContactSettings;
+      setContactSettings({
+        ...blankContact,
+        ...savedContact,
+        email: savedContact.email?.trim() || blankContact.email,
+      });
+    }
     setDataLoading(false);
   }, [profile]);
 
@@ -1694,7 +1700,7 @@ export default function AdminPage() {
                   </label>
                 </div>
                 <div className="admin-form-footer">
-                  <p>Email e PEC sono mostrate sul sito solo dopo essere state compilate.</p>
+                  <p>L’email pubblica predefinita è info@casadibari.it; la PEC viene mostrata solo se compilata.</p>
                   <Button
                     variant="contained"
                     size="large"
