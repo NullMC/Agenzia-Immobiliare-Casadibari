@@ -10,6 +10,7 @@ const defaultContact: ContactSettings = {
   vatNumber: '08451090727',
   address: 'Via Pasubio, 78A, 70125 Bari BA',
   phone: '080 849 1745',
+  email: 'info@casadibari.it',
   mapsEmbedUrl: 'https://www.google.com/maps?q=Via%20Pasubio%2078A%20Bari&output=embed',
 };
 
@@ -25,7 +26,14 @@ export default function SiteLayout() {
       .eq('key', 'contact')
       .maybeSingle()
       .then(({ data }) => {
-        if (data?.value) setContact({ ...defaultContact, ...(data.value as ContactSettings) });
+        if (data?.value) {
+          const savedContact = data.value as ContactSettings;
+          setContact({
+            ...defaultContact,
+            ...savedContact,
+            email: savedContact.email?.trim() || defaultContact.email,
+          });
+        }
       });
   }, []);
 
