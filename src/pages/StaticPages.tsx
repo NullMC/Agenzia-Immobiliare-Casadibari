@@ -432,9 +432,9 @@ export function MortgagePage() {
         path="/consulenza-mutui"
       />
       <PageHero
-        eyebrow="Un progetto, più risposte"
-        title="Mutui e prestiti: orientati con serenità."
-        description="L’acquisto di una casa porta con sé domande importanti. Ti aiutiamo a individuare i prossimi passi e i referenti da coinvolgere."
+        eyebrow="Mutui e prestiti"
+        title="Orientati con serenità."
+        description="Ti aiutiamo a individuare i prossimi passi e i referenti da coinvolgere."
       />
       <section className="section">
         <div className="container mortgage-layout">
@@ -498,7 +498,7 @@ export function MortgagePage() {
       <section className="closing-cta">
         <div className="container closing-cta__inner">
           <div>
-            <span className="eyebrow eyebrow--light">Parliamone</span>
+            <span className="eyebrow">Parliamone</span>
             <h2>Hai già individuato un immobile?</h2>
             <p>Possiamo aiutarti a organizzare i prossimi passi del percorso.</p>
           </div>
@@ -896,15 +896,7 @@ export function PrivacyPage() {
       />
       <section className="section">
         <div className="container legal-copy">
-          <div className="platforms-note">
-            <strong>Bozza da completare prima del lancio</strong>
-            <p>
-              Il testo seguente è una base informativa e non sostituisce l’informativa legale
-              definitiva. Il titolare deve confermare i dati di contatto, finalità, basi giuridiche,
-              tempi di conservazione, destinatari e modalità di esercizio dei diritti con un
-              referente competente.
-            </p>
-          </div>
+          
           <h2>Titolare del trattamento</h2>
           <p>
             Casadibari Immobiliare sas di Casadibari Maurizio &amp; C, con sede in Via Pasubio 78A,
@@ -928,14 +920,11 @@ export function PrivacyPage() {
           <p>
             I tempi di conservazione e i recapiti per le richieste di accesso, rettifica,
             cancellazione o revoca del consenso devono essere definiti nell’informativa definitiva.
-            Non pubblicare questa pagina come informativa finale prima di averla completata.
           </p>
           <h2>Servizi esterni</h2>
           <p>
             Il sito utilizza Supabase per la gestione dei dati e può utilizzare un fornitore di
-            posta elettronica per inviare gli avvisi. La mappa incorporata è fornita da Google Maps.
-            I dettagli dei servizi effettivamente attivati devono essere verificati prima del
-            lancio.
+            posta elettronica per inviare gli avvisi. La mappa incorporata è fornita da Google Maps, mentre il widget recensioni é fornito da Elfsight.
           </p>
           <Button
             component={Link}
