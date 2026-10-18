@@ -150,18 +150,6 @@ export function AboutPage() {
           </div>
         </section>
       )}
-      <section className="section" id="recensioni">
-        <div className="container">
-          <div className="section-heading">
-            <div>
-              <span className="eyebrow">Le esperienze dei clienti</span>
-              <h2>Le parole che ci fanno crescere</h2>
-              <p>Leggi le recensioni dei clienti tramite il widget Elfsight.</p>
-            </div>
-          </div>
-          <ElfsightReviews />
-        </div>
-      </section>
       <section className="section section--soft">
         <div className="container office-grid">
           <div>
