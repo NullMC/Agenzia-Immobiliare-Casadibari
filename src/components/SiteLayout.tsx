@@ -158,16 +158,6 @@ export default function SiteLayout() {
                   <Facebook size={18} />
                 </a>
               )}
-              {whatsappNumber && (
-                <a
-                  href={'https://wa.me/' + whatsappNumber}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="WhatsApp"
-                >
-                  WA
-                </a>
-              )}
             </div>
           </div>
           <div className="footer-column">
