@@ -50,7 +50,7 @@ npx supabase projects list
 npx supabase link --project-ref TUO_PROJECT_REF
 ```
 
-Per un progetto nuovo, applica tramite SQL Editor `supabase/migrations/202610130001_initial_schema.sql` oppure usa `npx supabase db push`. Se il database era già stato inizializzato con una versione precedente del progetto, applica anche la migrazione `supabase/migrations/202610140001_remove_reviews_table_use_elfsight.sql` (con `npx supabase db push` oppure eseguendo quel file in SQL Editor): rimuove la tabella `reviews`, perché le recensioni saranno fornite dal widget Elfsight e non salvate in Supabase. Non rieseguire alla cieca la migrazione iniziale su un database già attivo.
+Per un progetto nuovo, applica le migrazioni tramite `npx supabase db push` oppure segui le istruzioni SQL qui indicate. Se il database è già attivo, esegui `npx supabase db push` per applicare le migrazioni ancora pendenti, senza rieseguire alla cieca la migrazione iniziale. La migrazione `202610140001_remove_reviews_table_use_elfsight.sql` rimuove la tabella `reviews`, perché le recensioni sono gestite dal widget Elfsight. La migrazione `202610180001_set_official_agency_email.sql` imposta `info@casadibari.it` come email pubblica nelle impostazioni del sito, preservando gli altri recapiti. Puoi anche eseguire quest'ultima migrazione direttamente in SQL Editor.
 
 Distribuisci le funzioni dal repository:
 
@@ -107,7 +107,7 @@ Per il primo accesso non esistono credenziali preimpostate: crea un utente Auth 
 
 ## Prima della messa online
 
-- Inserire in Impostazioni i recapiti ufficiali: PEC, email, numero mobile/WhatsApp, telefono fisso, pagine social e indirizzo Maps. Il sito attuale pubblica il numero 080 849 1745, l'indirizzo Via Pasubio 78A, Bari e la P.IVA 08451090727; PEC ed email non vengono inventate.
+- L'email pubblica ufficiale da utilizzare nei link di contatto è `info@casadibari.it`. Completare in Impostazioni gli altri recapiti confermati: PEC, numero mobile/WhatsApp, telefono fisso, pagine social e indirizzo Maps. Il sito attuale pubblica il numero 080 849 1745, l'indirizzo Via Pasubio 78A, Bari e la P.IVA 08451090727; non inventare una PEC.
 - Sostituire le immagini dimostrative con fotografie autorizzate dell'agenzia e degli immobili.
 - Verificare informativa privacy, consenso per i contatti e per gli alert email, cookie/analytics eventualmente aggiunti e tempi di conservazione dei dati con il referente competente.
 - Aggiornare `VITE_SITE_URL`, `public/robots.txt` e `public/sitemap.xml` al dominio definitivo. Per SEO avanzata, includere nel sitemap gli URL degli annunci effettivamente pubblicati.
