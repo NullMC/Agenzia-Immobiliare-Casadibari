@@ -116,7 +116,7 @@ export function AboutPage() {
           </div>
           <div className="about-photo">
             <img
-              src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85"
+              src="/Maurizio.jpg"
               alt="Interni contemporanei e luminosi"
               loading="lazy"
             />

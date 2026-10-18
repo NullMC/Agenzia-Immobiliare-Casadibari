@@ -12,17 +12,17 @@ import { demoFaqs, type Faq, type Property } from '../types';
 const heroSlides = [
   {
     image:
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=2200&q=90',
+      '/Poggiofranco.webp',
     title: 'Il posto giusto\nper la tua prossima storia.',
   },
   {
     image:
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2200&q=90',
+      'Strada.webp',
     title: 'Troviamo insieme\nla casa che ti somiglia.',
   },
   {
     image:
-      'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=2200&q=90',
+      'Lungomare.webp',
     title: 'Le scelte importanti\nmeritano una guida.',
   },
 ];
@@ -188,7 +188,7 @@ export default function HomePage() {
         <div className="container story-grid">
           <div className="story-image">
             <img
-              src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1300&q=85"
+              src="/VetrinaEsterna.webp"
               alt="Ambiente accogliente e luminoso"
               loading="lazy"
             />
