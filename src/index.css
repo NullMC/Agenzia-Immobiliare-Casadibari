@@ -2096,26 +2096,135 @@ h4 {
 .footer-bottom a:hover {
   color: #fff;
 }
-.whatsapp-float {
+/* Fixed radial contact menu */
+.contact-radial {
   position: fixed;
-  z-index: 45;
-  right: 22px;
-  bottom: 22px;
+  z-index: 80;
+  right: clamp(12px, calc((100vw - 1180px) / 2), 28px);
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: 300px;
+  height: 224px;
+  pointer-events: none;
+}
+.contact-radial__actions {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.contact-radial__action {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  min-height: 44px;
+  padding: 10px 13px;
+  border: 1px solid #e1eae1;
+  border-radius: 999px;
+  background: #fff;
+  color: #203a26;
+  box-shadow: 0 8px 24px rgba(17, 43, 22, 0.14);
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(14px, 18px, 0) scale(0.82);
+  transform-origin: 100% 100%;
+  transition:
+    opacity 0.2s ease,
+    transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.contact-radial__action svg {
+  flex: 0 0 auto;
+  color: var(--brand-dark);
+}
+.contact-radial__action:hover {
+  background: #f3faf4;
+  box-shadow: 0 10px 28px rgba(17, 43, 22, 0.2);
+}
+.contact-radial__action--whatsapp {
+  right: 2px;
+  bottom: 72px;
+  width: 150px;
+  transition-delay: 45ms;
+}
+.contact-radial__action--whatsapp svg {
+  color: #20a957;
+}
+.contact-radial__action--phone {
+  right: 78px;
+  bottom: 126px;
+  width: 132px;
+  transition-delay: 90ms;
+}
+.contact-radial__action--email {
+  right: 158px;
+  bottom: 72px;
+  width: 140px;
+  transition-delay: 135ms;
+}
+.contact-radial__action--form {
+  right: 145px;
+  bottom: 176px;
+  width: 132px;
+  transition-delay: 180ms;
+}
+.contact-radial.is-open .contact-radial__action {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+.contact-radial.is-open .contact-radial__action--whatsapp {
+  transition-delay: 180ms;
+}
+.contact-radial.is-open .contact-radial__action--phone {
+  transition-delay: 135ms;
+}
+.contact-radial.is-open .contact-radial__action--email {
+  transition-delay: 90ms;
+}
+.contact-radial.is-open .contact-radial__action--form {
+  transition-delay: 45ms;
+}
+.contact-radial__toggle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: #20b65b;
-  color: #fff;
+  width: 60px;
+  height: 60px;
+  padding: 0;
   border: 3px solid #fff;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.18);
-  font-size: 12px;
-  font-weight: 900;
-  transition: transform 0.2s;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  box-shadow: 0 7px 24px rgba(17, 43, 22, 0.28);
+  pointer-events: auto;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
 }
-.whatsapp-float:hover {
-  transform: translateY(-3px);
+.contact-radial__toggle:hover {
+  background: var(--brand-dark);
+  box-shadow: 0 10px 28px rgba(17, 43, 22, 0.32);
+  transform: translateY(-2px);
+}
+.contact-radial.is-open .contact-radial__toggle {
+  background: var(--ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-radial__action,
+  .contact-radial__toggle {
+    transition: none;
+  }
 }
 
 /* Rich text editor */
@@ -3671,11 +3780,40 @@ h4 {
     gap: 9px;
     padding: 14px 0;
   }
-  .whatsapp-float {
-    right: 14px;
-    bottom: 14px;
-    width: 49px;
-    height: 49px;
+  .contact-radial {
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: min(300px, calc(100vw - 24px));
+    height: 224px;
+  }
+  .contact-radial__toggle {
+    width: 56px;
+    height: 56px;
+  }
+  .contact-radial__action {
+    min-height: 42px;
+    padding: 9px 11px;
+    font-size: 11px;
+  }
+  .contact-radial__action--whatsapp {
+    right: 0;
+    bottom: 70px;
+    width: 148px;
+  }
+  .contact-radial__action--phone {
+    right: 74px;
+    bottom: 123px;
+    width: 130px;
+  }
+  .contact-radial__action--email {
+    right: 154px;
+    bottom: 70px;
+    width: 138px;
+  }
+  .contact-radial__action--form {
+    right: 140px;
+    bottom: 174px;
+    width: 132px;
   }
   .admin-login-card {
     padding: 27px 22px;
