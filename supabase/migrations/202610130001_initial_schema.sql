@@ -231,7 +231,7 @@ insert into public.site_settings(key, value) values
     'phone', '080 849 1745',
     'mobile', '',
     'whatsapp', '',
-    'email', '',
+    'email', 'info@casadibari.it',
     'pec', '',
     'instagram', '',
     'facebook', '',
