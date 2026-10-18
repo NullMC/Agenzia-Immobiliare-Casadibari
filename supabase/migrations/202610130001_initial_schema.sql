@@ -230,7 +230,7 @@ insert into public.site_settings(key, value) values
     'address', 'Via Pasubio, 78A, 70125 Bari BA',
     'phone', '080 849 1745',
     'mobile', '',
-    'whatsapp', '',
+    'whatsapp', '393338510522',
     'email', 'info@casadibari.it',
     'pec', '',
     'instagram', '',
