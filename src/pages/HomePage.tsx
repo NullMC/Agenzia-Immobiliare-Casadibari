@@ -263,9 +263,8 @@ export default function HomePage() {
       <section className="review-section section">
         <div className="container review-section__inner">
           <div className="review-intro">
-            <span className="eyebrow eyebrow--light">La fiducia, prima di tutto</span>
-            <h2>Le relazioni sono il nostro risultato più importante.</h2>
-            <p>Il percorso immobiliare si costruisce con ascolto, chiarezza e cura. Scopri le esperienze condivise dai nostri clienti.</p>
+            <span className="eyebrow eyebrow--light">Le relazioni sono il nostro risultato più importante.</span>
+            <h2>Scopri le esperienze condivise dai nostri clienti.</h2>
             <Button component={Link} to="/chi-siamo" variant="outlined" color="primary" endIcon={<ArrowRight size={16} />}>Scopri chi siamo</Button>
           </div>
           <div className="review-widget-panel">
