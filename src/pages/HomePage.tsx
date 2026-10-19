@@ -92,15 +92,19 @@ export default function HomePage() {
         jsonLd={businessJsonLd}
       />
       <section className="hero">
-        <div
-          className="hero__visual"
-          style={{
-            backgroundImage:
-              'linear-gradient(90deg, rgba(10, 26, 15, .78) 0%, rgba(10, 26, 15, .43) 52%, rgba(10, 26, 15, .12) 100%), url("' +
-              activeSlide.image +
-              '")',
-          }}
-        />
+        {heroSlides.map((item, index) => (
+          <div
+            key={item.image}
+            className={'hero__visual' + (index === slide ? ' is-active' : '')}
+            aria-hidden="true"
+            style={{
+              backgroundImage:
+                'linear-gradient(90deg, rgba(10, 26, 15, .78) 0%, rgba(10, 26, 15, .43) 52%, rgba(10, 26, 15, .12) 100%), url("' +
+                item.image +
+                '")',
+            }}
+          />
+        ))}
         <div className="container hero__content">
           <div className="hero__text">
             <h1>
