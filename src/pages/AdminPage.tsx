@@ -722,13 +722,9 @@ export default function AdminPage() {
       <main className="admin-main">
         <header className="admin-topbar">
           <div>
-            <span className="eyebrow">CASADIBARI IMMOBILIARE</span>
             <h1>{tabs.find((tab) => tab.id === activeTab)?.label || 'Dashboard'}</h1>
           </div>
           <div className="admin-topbar__right">
-            <span className="admin-session">
-              <span /> Sessione attiva
-            </span>
             <button className="admin-topbar-logout" type="button" onClick={logout}>
               <LogOut size={16} /> Esci
             </button>
@@ -1612,7 +1608,7 @@ export default function AdminPage() {
                     />
                   </label>
                   <label className="field">
-                    <span>Numero WhatsApp (prefisso internazionale)</span>
+                    <span>Numero WhatsApp</span>
                     <input
                       value={contactSettings.whatsapp || ''}
                       onChange={(e) =>
@@ -1686,23 +1682,6 @@ export default function AdminPage() {
                       Incolla l’URL di incorporamento della mappa, non una chiave API privata.
                     </small>
                   </label>
-                  <label className="field field--wide">
-                    <span>Piattaforme e canali promozionali per “Pubblica con noi”</span>
-                    <textarea
-                      rows={3}
-                      value={contactSettings.publicityPlatforms || ''}
-                      onChange={(e) =>
-                        setContactSettings((current) => ({
-                          ...current,
-                          publicityPlatforms: e.target.value,
-                        }))
-                      }
-                      placeholder="Inserisci i canali confermati dall’agenzia…"
-                    />
-                  </label>
-                </div>
-                <div className="admin-form-footer">
-                  <p>Email pubblica predefinita: info@casadibari.it. WhatsApp: +39 333 851 0522. La PEC viene mostrata solo se compilata.</p>
                   <Button
                     variant="contained"
                     size="large"
