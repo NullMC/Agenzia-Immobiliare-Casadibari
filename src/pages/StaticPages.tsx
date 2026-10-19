@@ -121,7 +121,7 @@ export function AboutPage() {
               loading="lazy"
             />
             <div className="about-photo__caption">
-              <strong>Dal 2001</strong>
+              <strong>Da 25+ anni</strong>
               <span>al fianco di chi cerca casa</span>
             </div>
           </div>

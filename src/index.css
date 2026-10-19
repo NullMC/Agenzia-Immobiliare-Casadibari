@@ -367,7 +367,7 @@ h4 {
   justify-content: center;
   border: 0;
   border-radius: 9px;
-  background: #edf7ef;
+  background: transparent;
   color: var(--brand-dark);
   width: 44px;
   height: 44px;
@@ -4112,7 +4112,7 @@ h4 {
   height: 44px;
   border-radius: 9px;
   color: var(--brand-dark);
-  background: #edf7ef;
+  background: transparent;
 }
 @media (max-width: 900px) {
   .mobile-menu-toggle.MuiIconButton-root {
