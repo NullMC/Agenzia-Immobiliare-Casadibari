@@ -6,6 +6,7 @@ import Seo from '../components/Seo';
 import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
 import ElfsightReviews from '../components/ElfsightReviews';
+import { ValuationSection } from './StaticPages';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { demoFaqs, type Faq, type Property } from '../types';
 
@@ -187,6 +188,8 @@ export default function HomePage() {
           )}
         </div>
       </section>
+
+      <ValuationSection />
 
       <section className="section story-section">
         <div className="container story-grid">
