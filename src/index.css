@@ -1692,12 +1692,6 @@ h4 {
   background: #eaf5eb;
   border-radius: 50%;
   box-shadow: var(--shadow-card);
-  transition: transform 0.5s ease;
-}
-
-.team-card img:hover {
-  transform: translate(1.045);
-  
 }
 
 .team-card__initials {
