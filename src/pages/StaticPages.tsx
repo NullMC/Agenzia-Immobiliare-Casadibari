@@ -201,6 +201,20 @@ export function AboutPage() {
 }
 
 export function ValuationPage() {
+  return (
+    <>
+      <Seo
+        title="Valutazione gratuita immobile a Bari | Casadibari"
+        description="Richiedi una prima valutazione del tuo appartamento, casa o locale a Bari. Compila il modulo con i dati essenziali e ti ricontatteremo."
+        path="/valutazione"
+      />
+      <PageHero eyebrow="" title="Quanto vale casa tua?" description="" />
+      <ValuationSection />
+    </>
+  );
+}
+
+export function ValuationSection() {
   const [form, setForm] = useState({
     address: '',
     property_type: 'Appartamento',
@@ -257,13 +271,6 @@ export function ValuationPage() {
   };
 
   return (
-    <>
-      <Seo
-        title="Valutazione gratuita immobile a Bari | Casadibari"
-        description="Richiedi una prima valutazione del tuo appartamento, casa o locale a Bari. Compila il modulo con i dati essenziali e ti ricontatteremo."
-        path="/valutazione"
-      />
-      <PageHero eyebrow="" title="Quanto vale casa tua?" description="" />
       <section className="section valuation-section">
         <div className="container valuation-layout">
           <div className="valuation-copy">
@@ -428,10 +435,8 @@ export function ValuationPage() {
           </form>
         </div>
       </section>
-    </>
   );
 }
-
 export function MortgagePage() {
   return (
     <>
