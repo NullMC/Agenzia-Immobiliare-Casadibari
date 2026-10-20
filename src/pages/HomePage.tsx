@@ -17,7 +17,7 @@ const heroSlides = [
   },
   {
     image:
-      'Strada.webp',
+      '/chiesarussa.webp',
     title: 'Troviamo insieme\nla casa che ti somiglia.',
   },
   {
