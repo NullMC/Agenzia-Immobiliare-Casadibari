@@ -129,7 +129,7 @@ export default function SiteLayout() {
               className="nav-cta"
               onClick={closeMenu}
             >
-              Parliamone <span aria-hidden="true">↗</span>
+              Contattaci <span aria-hidden="true"></span>
             </Button>
           </nav>
         </div>
@@ -215,7 +215,7 @@ export default function SiteLayout() {
               target="_blank"
               rel="noreferrer"
             >
-              Apri indicazioni su Maps ↗
+              Apri indicazioni su Maps
             </a>
           </div>
         </div>

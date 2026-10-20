@@ -42,8 +42,7 @@ export default function SearchBar({
             <SlidersHorizontal size={19} />
           </span>
           <div>
-            <strong>Trova la tua casa</strong>
-            <small>Imposta i tuoi criteri di ricerca</small>
+            <strong>Imposta i tuoi criteri di ricerca</strong>
           </div>
         </div>
       )}

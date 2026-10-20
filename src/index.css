@@ -517,7 +517,7 @@ h4 {
   display: grid;
   place-items: center;
   color: var(--brand-dark);
-  background: var(--brand-soft);
+  background: transparent;
   border-radius: 12px;
 }
 .search-panel__heading strong {
@@ -941,7 +941,6 @@ h4 {
   height: 50px;
   color: var(--brand-dark);
   border-radius: 13px;
-  background: var(--brand-soft);
 }
 .service-card h3 {
   margin: 22px 0 9px;
@@ -1187,7 +1186,7 @@ h4 {
   margin-bottom: 19px;
   border-radius: 13px;
   color: var(--brand-dark);
-  background: #dff2e2;
+  background: transparent;
 }
 .alert-section__copy h2 {
   margin: 10px 0 13px;
@@ -1776,8 +1775,8 @@ h4 {
   flex: 0 0 auto;
   border-radius: 10px;
   color: var(--brand-dark);
-  background: var(--brand-soft);
-  font-size: 12px;
+  background: transparent;
+  font-size: 32px;
   font-weight: 800;
 }
 .process-list strong {
@@ -1809,8 +1808,6 @@ h4 {
   height: 48px;
   flex: 0 0 auto;
   color: var(--brand-dark);
-  border-radius: 12px;
-  background: var(--brand-soft);
 }
 .form-card__heading h2 {
   margin: 0 0 4px;
@@ -1844,10 +1841,8 @@ h4 {
 .mortgage-benefits {
   display: grid;
   gap: 15px;
-  padding: 26px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: #f9fbf9;
+  margin-top: 26px;
+
 }
 .mortgage-benefits article {
   display: flex;

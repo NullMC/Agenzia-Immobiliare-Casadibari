@@ -626,7 +626,7 @@ export function PublishPage() {
                   aria-label="Apri il profilo Casadibari su Immobiliare.it in una nuova scheda"
                 >
                   <span>Immobiliare.it</span>
-                  <span aria-hidden="true">↗</span>
+                  <span aria-hidden="true"></span>
                 </a>
                 <a
                   href="https://www.idealista.it/pro/casadibariagenziaimmobiliare/"
@@ -635,7 +635,7 @@ export function PublishPage() {
                   aria-label="Apri il profilo Casadibari su Idealista in una nuova scheda"
                 >
                   <span>Idealista</span>
-                  <span aria-hidden="true">↗</span>
+                  <span aria-hidden="true"></span>
                 </a>
                 <a
                   href="https://www.casa.it/agenzie/casadibari-agenzia-immobiliare-1196055/"
@@ -644,7 +644,7 @@ export function PublishPage() {
                   aria-label="Apri il profilo Casadibari su Casa.it in una nuova scheda"
                 >
                   <span>Casa.it</span>
-                  <span aria-hidden="true">↗</span>
+                  <span aria-hidden="true"></span>
                 </a>
                 <a
                   href="https://www.trovacasa.it/agenzie-immobiliari/casadibari-immobiliare-tc-37466/annunci"
@@ -653,7 +653,7 @@ export function PublishPage() {
                   aria-label="Apri gli annunci Casadibari su TrovaCasa in una nuova scheda"
                 >
                   <span>TrovaCasa</span>
-                  <span aria-hidden="true">↗</span>
+                  <span aria-hidden="true"></span>
                 </a>
               </div>
             </div>
