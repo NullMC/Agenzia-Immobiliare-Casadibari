@@ -132,9 +132,8 @@ export function AboutPage() {
           <div className="container">
             <div className="section-heading">
               <div>
-                <span className="eyebrow">Le persone</span>
                 <h2>Il nostro team</h2>
-                <p>Le persone che ti accompagneranno nel tuo percorso.</p>
+                <p>Ecco chi ti accompagnerá nel tuo percorso.</p>
               </div>
             </div>
             <div className="team-grid">
