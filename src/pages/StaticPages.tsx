@@ -313,7 +313,7 @@ export function ValuationSection() {
                 <Home size={22} />
               </span>
               <div>
-                <h2>Richiedi la valutazione</h2>
+                <h2>Richiedi la valutazione gratuita</h2>
                 <p>I campi con * sono obbligatori.</p>
               </div>
             </div>

@@ -237,7 +237,7 @@ export default function HomePage() {
               <span className="service-card__icon">
                 <Home size={24} />
               </span>
-              <h3>Valuta il tuo immobile</h3>
+              <h3>Valuta il tuo immobile gratuitamente</h3>
               <p>Richiedi una prima valutazione e scopri come valorizzare la tua proprietà.</p>
               <span className="text-link">
                 Richiedi una valutazione <ArrowRight size={16} />
