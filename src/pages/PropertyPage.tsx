@@ -81,7 +81,7 @@ export default function PropertyPage() {
           noIndex
         />
         <section className="not-found container">
-          <span className="eyebrow">Annuncio non disponibile</span>
+          
           <h1>Non troviamo questo immobile.</h1>
           <p>Potrebbe essere stato aggiornato o non essere più disponibile.</p>
           <Link className="button button--primary" to="/immobili">
@@ -294,8 +294,8 @@ export default function PropertyPage() {
             </div>
           </article>
           <aside className="property-contact-card">
-            <span className="eyebrow">Ti interessa?</span>
-            <h2>Vieni a vedere se è casa tua.</h2>
+
+            <h2>Ti interessa?</h2>
             <p>Contattaci per ricevere maggiori informazioni o fissare una visita.</p>
             <a className="button button--primary button--full" href="tel:+390808491745">
               <Phone size={17} /> 080 849 1745
@@ -312,7 +312,6 @@ export default function PropertyPage() {
           <section className="related-properties">
             <div className="section-heading">
               <div>
-                <span className="eyebrow">Potrebbero interessarti</span>
                 <h2>Altre proposte simili</h2>
               </div>
               <Link className="text-link" to="/immobili">
