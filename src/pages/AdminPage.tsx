@@ -25,10 +25,11 @@ import {
 import { Alert, Button, IconButton, TextField } from '@mui/material';
 import Seo from '../components/Seo';
 import RichTextEditor from '../components/RichTextEditor';
+import AdminArticles from '../components/AdminArticles';
 import { supabase } from '../lib/supabase';
 import type { ContactSettings, Faq, Property, PropertyImage, TeamMember } from '../types';
 
-type Tab = 'properties' | 'faqs' | 'requests' | 'team' | 'settings';
+type Tab = 'properties' | 'articles' | 'faqs' | 'requests' | 'team' | 'settings';
 type PropertyForm = {
   title: string;
   subtitle: string;
@@ -660,6 +661,7 @@ export default function AdminPage() {
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: 'properties', label: 'Annunci', icon: <Home size={18} /> },
+    { id: 'articles', label: 'Articoli', icon: <FileText size={18} /> },
     { id: 'faqs', label: 'FAQ', icon: <MessageSquare size={18} /> },
     { id: 'requests', label: 'Richieste', icon: <ClipboardList size={18} /> },
     { id: 'team', label: 'Team', icon: <Users size={18} /> },
@@ -1174,6 +1176,8 @@ export default function AdminPage() {
               </div>
             </section>
           )}
+
+          {activeTab === 'articles' && <AdminArticles />}
 
           {activeTab === 'faqs' && (
             <section>
