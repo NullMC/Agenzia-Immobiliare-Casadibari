@@ -12,6 +12,7 @@ import {
   ValuationPage,
 } from './pages/StaticPages';
 import AdminPage from './pages/AdminPage';
+import { BlogArticlePage, BlogPage } from './pages/BlogPages';
 
 export default function App() {
   return (
@@ -19,6 +20,8 @@ export default function App() {
       <Route element={<SiteLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/immobili" element={<PropertiesPage />} />
+        <Route path="/guide" element={<BlogPage />} />
+        <Route path="/guide/:slug" element={<BlogArticlePage />} />
         <Route path="/immobile/:slug" element={<PropertyPage />} />
         <Route path="/chi-siamo" element={<AboutPage />} />
         <Route path="/valutazione" element={<ValuationPage />} />
