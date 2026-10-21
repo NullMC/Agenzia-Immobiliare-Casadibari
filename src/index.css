@@ -4169,20 +4169,63 @@ h4 {
 }
 
 
-/* Enlarged branding, responsive navigation and hero spacing */
+/* Enlarged navigation identity and responsive, split homepage hero.
+   The square logo source has substantial transparent margins, so its displayed
+   height must grow with its width instead of constraining object-fit. */
 @media (min-width: 1101px) {
-  .site-header__inner { min-height: 142px; gap: 14px; }
-  .brand { width: clamp(390px, 32vw, 460px); min-width: 0; flex: 0 0 auto; }
-  .brand img { width: 100%; height: 132px; object-fit: contain; object-position: left center; }
-  .main-nav { gap: clamp(8px, 1vw, 15px); flex-shrink: 1; }
+  .site-header__inner {
+    min-height: 230px;
+    gap: 14px;
+  }
+  .site-header .brand {
+    position: relative;
+    display: block;
+    width: 340px;
+    height: 220px;
+    overflow: hidden;
+    flex: 0 0 340px;
+  }
+  .site-header .brand img {
+    position: absolute;
+    top: -30px;
+    left: 0;
+    width: 340px;
+    height: 340px;
+    max-width: none;
+    object-fit: contain;
+    object-position: center;
+  }
+  .main-nav {
+    gap: clamp(8px, 1vw, 15px);
+    min-width: 0;
+  }
   .main-nav__link { font-size: 12px; }
-  .nav-cta { white-space: nowrap; padding: 9px 11px; }
+  .site-header .nav-cta { white-space: nowrap; padding-inline: 11px; }
 }
 @media (min-width: 901px) and (max-width: 1100px) {
-  .site-header__inner { min-height: 112px; gap: 14px; }
-  .brand { width: clamp(320px, 38vw, 405px); flex: 0 0 auto; }
-  .brand img { width: 100%; height: 100px; object-position: left center; }
-  .mobile-menu-toggle.MuiIconButton-root { display: inline-flex; margin-left: auto; flex: 0 0 44px; }
+  .site-header__inner { min-height: 190px; gap: 14px; }
+  .site-header .brand {
+    display: block;
+    position: relative;
+    width: 292px;
+    height: 184px;
+    flex: 0 0 292px;
+    overflow: hidden;
+  }
+  .site-header .brand img {
+    position: absolute;
+    top: -26px;
+    left: 0;
+    width: 292px;
+    height: 292px;
+    max-width: none;
+    object-fit: contain;
+  }
+  .mobile-menu-toggle.MuiIconButton-root {
+    display: inline-flex;
+    margin-left: auto;
+    flex: 0 0 44px;
+  }
   .main-nav {
     position: absolute;
     top: 100%;
@@ -4198,7 +4241,11 @@ h4 {
     box-shadow: 0 17px 25px rgba(18, 43, 23, 0.09);
   }
   .main-nav.main-nav--open { display: flex; }
-  .main-nav__link { padding: 14px 0; font-size: 14px; border-bottom: 1px solid #f0f3f0; }
+  .main-nav__link {
+    padding: 14px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f3f0;
+  }
   .main-nav__link::after { display: none; }
   .nav-cta { margin-top: 12px; width: 100%; }
 }
@@ -4212,8 +4259,16 @@ h4 {
   padding-top: 58px;
   padding-bottom: 104px;
 }
-.hero__text { min-width: 0; max-width: 100%; position: relative; z-index: 1; }
-.hero h1 { font-size: clamp(38px, 4.25vw, 65px); overflow-wrap: normal; }
+.hero__text {
+  min-width: 0;
+  max-width: 100%;
+  position: relative;
+  z-index: 1;
+}
+.hero h1 {
+  font-size: clamp(38px, 4.25vw, 65px);
+  overflow-wrap: normal;
+}
 .hero__brand-panel {
   min-width: 0;
   display: flex;
@@ -4226,7 +4281,9 @@ h4 {
   width: min(100%, 590px);
   max-height: 470px;
   object-fit: contain;
-  filter: drop-shadow(0 16px 24px rgba(0,0,0,.75)) drop-shadow(0 3px 8px rgba(0,0,0,.8));
+  filter:
+    drop-shadow(0 16px 24px rgba(0, 0, 0, .75))
+    drop-shadow(0 3px 8px rgba(0, 0, 0, .8));
 }
 .hero__pagination {
   z-index: 3;
@@ -4234,30 +4291,84 @@ h4 {
   left: 0;
 }
 @media (max-width: 900px) {
-  .site-header__inner { display: flex; align-items: center; justify-content: space-between; }
-  .brand { width: clamp(155px, 34vw, 220px); flex: 0 0 auto; }
-  .brand img { width: 100%; height: 68px; object-position: left center; }
-  .mobile-menu-toggle.MuiIconButton-root { margin-left: auto; flex: 0 0 44px; }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 124px;
+  }
+  .site-header .brand {
+    display: block;
+    position: relative;
+    width: 180px;
+    height: 116px;
+    flex: 0 0 180px;
+    overflow: hidden;
+  }
+  .site-header .brand img {
+    position: absolute;
+    top: -14px;
+    left: 0;
+    width: 180px;
+    height: 180px;
+    max-width: none;
+    object-fit: contain;
+  }
+  .mobile-menu-toggle.MuiIconButton-root {
+    margin-left: auto;
+    flex: 0 0 44px;
+  }
   .hero__content {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 6px;
-    min-height: 690px;
-    padding-top: 34px;
-    padding-bottom: 86px;
+    grid-template-rows: minmax(235px, .9fr) minmax(300px, 1.1fr);
+    gap: 8px;
+    min-height: 760px;
+    padding-top: 24px;
+    padding-bottom: 112px;
   }
-  .hero__text { align-self: center; }
-  .hero h1 { font-size: clamp(32px, 7vw, 49px); margin: 0 0 14px; }
+  /* On phones/tablets the hero art leads, followed by the heading and CTA. */
+  .hero__brand-panel {
+    grid-row: 1;
+    align-self: center;
+    max-height: 265px;
+    padding: 0 12px;
+  }
+  .hero__brand-image {
+    width: min(100%, 415px);
+    max-height: 245px;
+  }
+  .hero__text {
+    grid-row: 2;
+    align-self: center;
+    padding-top: 6px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 7vw, 49px);
+    margin: 0 0 14px;
+  }
   .hero__text > p { font-size: 15px; }
   .hero__actions { margin-top: 18px; gap: 12px; }
-  .hero__brand-panel { align-self: center; padding: 0 12px; max-height: 270px; }
-  .hero__brand-image { max-height: 255px; width: min(100%, 400px); }
-  .hero__pagination { bottom: 67px; left: 0; }
+  .hero__pagination { bottom: 68px; left: 0; }
 }
 @media (max-width: 480px) {
-  .brand { width: 165px; }
-  .brand img { width: 100%; height: 60px; }
-  .hero__content { min-height: 690px; width: calc(100% - 36px); padding-top: 28px; padding-bottom: 92px; }
-  .hero__brand-image { max-height: 225px; }
+  .site-header__inner { min-height: 108px; }
+  .site-header .brand {
+    width: 158px;
+    height: 100px;
+    flex-basis: 158px;
+  }
+  .site-header .brand img {
+    top: -12px;
+    width: 158px;
+    height: 158px;
+  }
+  .hero__content {
+    min-height: 760px;
+    grid-template-rows: minmax(215px, .8fr) minmax(320px, 1.2fr);
+    width: calc(100% - 36px);
+    padding-top: 22px;
+    padding-bottom: 108px;
+  }
+  .hero__brand-image { max-height: 230px; }
   .hero__pagination { bottom: 68px; }
 }
