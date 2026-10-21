@@ -1,3 +1,17 @@
+export interface BlogArticle {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  body_html: string;
+  cover_image_url: string;
+  published: boolean;
+  published_at: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export type PropertyStatus = 'available' | 'under_offer' | 'sold' | 'rented';
 
 export interface PropertyImage {
