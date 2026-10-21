@@ -4167,3 +4167,65 @@ h4 {
   color: var(--ink);
   box-shadow: var(--shadow-card);
 }
+
+
+/* Prominent brand identity and split homepage hero */
+@media (min-width: 901px) {
+  .site-header__inner { min-height: 124px; gap: 18px; }
+  .brand { width: clamp(270px, 25vw, 365px); }
+  .brand img { width: 100%; height: 112px; }
+  .main-nav { gap: clamp(10px, 1.25vw, 20px); }
+  .main-nav__link { font-size: 12px; }
+}
+.hero__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(18px, 3vw, 50px);
+  width: min(1320px, calc(100% - 48px));
+  min-height: 610px;
+}
+.hero__text { min-width: 0; max-width: 100%; position: relative; z-index: 1; }
+.hero h1 { font-size: clamp(38px, 4.25vw, 65px); overflow-wrap: normal; }
+.hero__brand-panel {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.hero__brand-image {
+  display: block;
+  width: min(100%, 590px);
+  max-height: 470px;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 24px rgba(0,0,0,.75)) drop-shadow(0 3px 8px rgba(0,0,0,.8));
+}
+@media (max-width: 900px) {
+  .site-header__inner { display: flex; align-items: center; justify-content: space-between; }
+  .brand { width: clamp(155px, 34vw, 220px); flex: 0 0 auto; }
+  .brand img { width: 100%; height: 68px; object-position: left center; }
+  .mobile-menu-toggle { margin-left: auto; flex: 0 0 44px; }
+  .hero__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 4px;
+    min-height: 690px;
+    padding-top: 38px;
+    padding-bottom: 68px;
+  }
+  .hero__text { align-self: center; }
+  .hero h1 { font-size: clamp(32px, 7vw, 49px); margin: 0 0 14px; }
+  .hero__text > p { font-size: 15px; }
+  .hero__actions { margin-top: 18px; gap: 12px; }
+  .hero__brand-panel { align-self: center; padding: 0 12px; max-height: 300px; }
+  .hero__brand-image { max-height: 285px; width: min(100%, 420px); }
+  .hero__pagination { bottom: 28px; left: 0; }
+}
+@media (max-width: 480px) {
+  .brand { width: 165px; }
+  .brand img { height: 60px; }
+  .hero__content { min-height: 670px; width: min(100% - 36px, 1320px); }
+  .hero__brand-image { max-height: 255px; }
+}
