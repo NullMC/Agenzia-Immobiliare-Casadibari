@@ -1,0 +1,119 @@
+-- Casadibari magazine: articles, publishing workflow and image library
+-- Run in Supabase SQL Editor or via: npx supabase db push
+create table if not exists public.articles (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
+  title text not null check (length(trim(title)) > 0),
+  excerpt text not null default '',
+  category text not null default 'Consigli e guide',
+  body_html text not null default '',
+  cover_image_url text not null default '',
+  published boolean not null default false,
+  published_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists articles_published_idx
+  on public.articles (published, published_at desc, created_at desc);
+drop trigger if exists articles_set_updated_at on public.articles;
+create trigger articles_set_updated_at
+  before update on public.articles
+  for each row execute function public.set_updated_at();
+
+alter table public.articles enable row level security;
+create policy "Visitors can read published articles"
+  on public.articles for select to anon, authenticated
+  using (published = true);
+create policy "Admins can manage articles"
+  on public.articles for all to authenticated
+  using (public.is_admin()) with check (public.is_admin());
+grant select on public.articles to anon, authenticated;
+grant insert, update, delete on public.articles to authenticated;
+
+-- Editor uploads: public delivery; only verified admins may modify images.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('article-images', 'article-images', true, 12582912,
+        array['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
+on conflict (id) do nothing;
+create policy "Public can view article images"
+  on storage.objects for select to anon, authenticated
+  using (bucket_id = 'article-images');
+create policy "Admins can upload article images"
+  on storage.objects for insert to authenticated
+  with check (bucket_id = 'article-images' and public.is_admin());
+create policy "Admins can update article images"
+  on storage.objects for update to authenticated
+  using (bucket_id = 'article-images' and public.is_admin())
+  with check (bucket_id = 'article-images' and public.is_admin());
+create policy "Admins can delete article images"
+  on storage.objects for delete to authenticated
+  using (bucket_id = 'article-images' and public.is_admin());
+
+-- Editorial starting points, editable in the administration dashboard.
+-- Intentionally contains NO invented 2026 property prices, client demand or results.
+with initial_articles as (
+  select * from jsonb_to_recordset($editorial$
+[
+  {
+    "slug": "quanto-vale-un-appartamento-a-carrassi-nel-2026",
+    "title": "Quanto vale un appartamento a Carrassi nel 2026?",
+    "category": "Mercato di Bari",
+    "excerpt": "Prezzi richiesti e valore di vendita non sono la stessa cosa. Ecco come leggere il mercato di Carrassi e quali fattori incidono davvero sulla valutazione.",
+    "cover_image_url": "/Poggiofranco.webp",
+    "body_html": "<p>Quanto può valere oggi un appartamento nel quartiere Carrassi, a Bari? Non esiste un prezzo valido per tutti gli immobili: anche due appartamenti nella stessa strada possono avere valori diversi. Una stima credibile parte dalle caratteristiche specifiche della casa e dal confronto con il mercato.</p>\n<h2>Perché non basta il prezzo al metro quadro</h2>\n<p>Le quotazioni medie sono utili per orientarsi, ma non descrivono da sole la commerciabilità di un immobile. Il piano, la presenza dell'ascensore, lo stato di manutenzione, la luminosità, l'efficienza energetica, la distribuzione degli spazi e le eventuali pertinenze possono influenzare la valutazione.</p>\n<h2>Annunci pubblicati e compravendite concluse</h2>\n<p>Il prezzo esposto su un portale è una richiesta del venditore, non necessariamente il valore al quale si conclude una trattativa. Per un'analisi più accurata è opportuno considerare immobili davvero comparabili e, quando disponibili, dati sulle compravendite effettive. Le quotazioni OMI dell'Agenzia delle Entrate possono essere un punto di riferimento generale, non una perizia del singolo appartamento.</p>\n<h2>Una verifica in cinque passaggi</h2>\n<ul><li>Identificare la microzona e il contesto dell'edificio.</li><li>Esaminare metratura, piano, ascensore e stato interno.</li><li>Valutare balconi, terrazzi, cantine, box e altri accessori.</li><li>Confrontare gli immobili con caratteristiche simili, evitando confronti superficiali.</li><li>Definire un prezzo di partenza coerente con tempi e obiettivi di vendita.</li></ul>\n<p><strong>Perché il titolo parla del 2026?</strong> Perché una valutazione deve essere aggiornata al momento in cui decidi di vendere. In questa guida non indichiamo quotazioni numeriche non verificate: per una stima attuale e personalizzata serve un confronto sul tuo immobile.</p>\n<p>Se possiedi una casa a Carrassi, possiamo ascoltare la tua situazione e valutare insieme quali informazioni servono per stimarne il valore.</p>",
+    "published": true,
+    "published_at": "2026-10-21T00:00:00+02:00"
+  },
+  {
+    "slug": "vendere-casa-a-bari-sette-errori-da-evitare",
+    "title": "Vendere casa a Bari: 7 errori da evitare",
+    "category": "Consigli per vendere",
+    "excerpt": "Dal prezzo iniziale alle visite: sette scelte che possono complicare una vendita e come prepararsi con maggiore consapevolezza.",
+    "cover_image_url": "/Lungomare.webp",
+    "body_html": "<p>Vendere casa è un percorso fatto di decisioni, documenti, persone e tempi da coordinare. Alcuni errori ricorrenti possono rendere più difficile il dialogo con gli acquirenti o prolungare inutilmente la trattativa. Ecco sette aspetti da considerare prima di mettere un immobile sul mercato a Bari.</p>\n<h2>1. Partire da un prezzo senza un confronto di mercato</h2><p>Il valore affettivo di una casa è reale per chi la abita, ma non coincide necessariamente con la disponibilità a pagare degli acquirenti. Una valutazione basata su immobili comparabili aiuta a impostare aspettative più realistiche.</p>\n<h2>2. Trascurare le fotografie e la presentazione</h2><p>Immagini poco luminose o informazioni incomplete possono nascondere i punti di forza dell'appartamento. Una descrizione precisa e fotografie curate aiutano il visitatore a capire se la proposta fa per lui.</p>\n<h2>3. Non chiarire prima la situazione documentale</h2><p>La disponibilità dei documenti e le eventuali verifiche tecniche sono importanti per evitare difficoltà nelle fasi successive. È opportuno approfondirle con i professionisti competenti.</p>\n<h2>4. Comunicare informazioni approssimative</h2><p>Metrature, pertinenze, spese condominiali e condizioni dell'immobile devono essere descritte con accuratezza. Chiarezza e coerenza creano fiducia.</p>\n<h2>5. Organizzare le visite senza una strategia</h2><p>Una visita dovrebbe permettere di conoscere davvero gli ambienti e ottenere risposte. È utile concordare orari, modalità e informazioni da condividere con gli interessati.</p>\n<h2>6. Affrontare la trattativa senza aver definito le priorità</h2><p>Il prezzo non è l'unico elemento: possono contare tempi di consegna, condizioni della proposta e sostenibilità dei passaggi successivi. Prima di negoziare, chiarisci ciò che per te è essenziale.</p>\n<h2>7. Sottovalutare gli adempimenti fino al rogito</h2><p>Proposta, preliminare, verifiche, eventuale mutuo e atto notarile coinvolgono responsabilità e scadenze. Un percorso coordinato riduce le sorprese.</p>\n<p>Se stai considerando la vendita della tua casa a Bari, cominciare da una valutazione e da un confronto sulle tue esigenze è spesso il primo passo più utile.</p>",
+    "published": true,
+    "published_at": "2026-10-21T00:00:00+02:00"
+  },
+  {
+    "slug": "vendere-da-privato-o-con-agenzia",
+    "title": "Meglio vendere casa da privato o tramite agenzia?",
+    "category": "Consigli per vendere",
+    "excerpt": "Autonomia, tempo, organizzazione delle visite e trattative: un confronto pratico per scegliere il percorso di vendita più adatto.",
+    "cover_image_url": "/VetrinaEsterna.webp",
+    "body_html": "<p>Chi decide di vendere casa si pone spesso una domanda: gestire tutto personalmente oppure affidarsi a un'agenzia immobiliare? Non c'è una risposta uguale per tutti. La scelta dipende dal tempo disponibile, dalla familiarità con il mercato e dalla complessità della situazione.</p>\n<h2>Vendere da privato: autonomia e impegno</h2><p>Gestendo in autonomia la vendita, il proprietario controlla direttamente annunci, appuntamenti e comunicazioni. Deve però dedicare tempo alla definizione del prezzo, alla presentazione dell'immobile, alle risposte ai contatti, alle visite e alla negoziazione. È inoltre importante rivolgersi ai professionisti competenti per gli aspetti tecnici, fiscali e contrattuali.</p>\n<h2>Che cosa può offrire un'agenzia</h2><p>Un'agenzia può affiancare il proprietario nella lettura del mercato, nella preparazione dell'annuncio, nell'organizzazione delle visite, nel confronto con i potenziali acquirenti e nella gestione dei passaggi commerciali. Le attività specifiche, i compensi e le condizioni devono essere concordati con trasparenza prima dell'incarico.</p>\n<h2>Le domande da fare prima di scegliere</h2>\n<ul><li>Come viene determinato il prezzo iniziale?</li><li>Quali canali saranno utilizzati per promuovere l'immobile?</li><li>Come verranno organizzate le visite e comunicati gli aggiornamenti?</li><li>Quali servizi sono inclusi e quali eventuali costi sono previsti?</li><li>Come si coordineranno le verifiche documentali con i professionisti incaricati?</li></ul>\n<p>La qualità del confronto iniziale conta più delle promesse: chiedi un metodo chiaro, obiettivi comprensibili e risposte alle tue domande.</p>\n<p>Casadibari Immobiliare opera a Bari dal 2001. Se vuoi capire quale percorso possa essere adeguato alla tua proprietà, puoi richiedere un primo confronto senza impegno.</p>",
+    "published": true,
+    "published_at": "2026-10-21T00:00:00+02:00"
+  },
+  {
+    "slug": "come-vendere-casa-velocemente-senza-svenderla",
+    "title": "Come vendere casa velocemente senza svenderla",
+    "category": "Strategie di vendita",
+    "excerpt": "Un percorso realistico per dare visibilità a un immobile, selezionare le priorità e valutare le offerte senza inseguire scorciatoie.",
+    "cover_image_url": "/chiesarussa.webp",
+    "body_html": "<p>Vendere in tempi ragionevoli non significa necessariamente accettare la prima offerta o ridurre subito il prezzo. Significa preparare l'immobile, raccontarlo bene e impostare la strategia sulla domanda realmente interessata. Nessuno può garantire tempi di vendita identici per tutte le case.</p>\n<h2>Stabilisci il prezzo con un criterio</h2><p>Un prezzo di partenza scollegato dalle caratteristiche e dal mercato può scoraggiare i contatti, mentre un prezzo non ragionato rischia di penalizzare il proprietario. La valutazione dovrebbe considerare la zona, lo stato dell'immobile, i servizi, gli spazi e le alternative disponibili per l'acquirente.</p>\n<h2>Prepara la casa per essere raccontata</h2><p>Ordine, ambienti ben illuminati, fotografie nitide e una descrizione accurata rendono più semplice comprendere gli spazi. Non servono sempre interventi importanti: spesso la prima differenza è nella cura dei dettagli e nella chiarezza delle informazioni.</p>\n<h2>Scegli una promozione coerente</h2><p>Pubblicare ovunque senza criterio non garantisce risultati migliori. È utile pensare a chi potrebbe essere interessato, alle caratteristiche che cerca e ai canali più pertinenti. Anche la tempestività nelle risposte e una buona organizzazione delle visite contribuiscono all'esperienza degli acquirenti.</p>\n<h2>Valuta le offerte nel loro insieme</h2><p>Prezzo, modalità di pagamento, eventuali condizioni e tempi richiesti vanno considerati insieme. Confrontare gli elementi della proposta aiuta a prendere decisioni più consapevoli, con il supporto dei professionisti competenti quando necessario.</p>\n<p>Vuoi vendere un immobile a Bari? Raccontaci zona, tipologia e tempi desiderati: possiamo valutare insieme come impostare i primi passi, senza promesse di tempi o prezzi garantiti.</p>",
+    "published": true,
+    "published_at": "2026-10-21T00:00:00+02:00"
+  },
+  {
+    "slug": "documenti-necessari-per-vendere-casa-a-bari",
+    "title": "Quali documenti servono per vendere casa a Bari?",
+    "category": "Guide pratiche",
+    "excerpt": "Una guida orientativa a documenti catastali, provenienza, APE e verifiche da affrontare prima delle fasi decisive della vendita.",
+    "cover_image_url": "/VetrinaEsterna.webp",
+    "body_html": "<p>Raccogliere per tempo la documentazione dell'immobile può rendere più ordinato il percorso di vendita. I documenti necessari variano in base all'edificio, alla provenienza della proprietà e alle caratteristiche della compravendita: questa è una lista di orientamento, non una verifica legale o tecnica.</p>\n<h2>Il titolo di provenienza</h2><p>È utile reperire l'atto con cui hai acquistato o ricevuto l'immobile, ad esempio compravendita, donazione o successione, e segnalare eventuali situazioni particolari al notaio e ai professionisti che seguono l'operazione.</p>\n<h2>Informazioni catastali e planimetrie</h2><p>Visura e planimetria catastale permettono di identificare l'unità e confrontarne i dati con lo stato dei luoghi. La conformità catastale e gli aspetti urbanistico-edilizi richiedono controlli specifici: una visura da sola non attesta che tutto sia regolare.</p>\n<h2>Attestato di prestazione energetica</h2><p>L'APE è un documento importante nella commercializzazione degli immobili, salvo le eccezioni previste dalle norme. Occorre verificarne disponibilità e validità con un tecnico abilitato.</p>\n<h2>Condominio, impianti e altri elementi</h2><p>Se l'immobile fa parte di un condominio, possono essere utili informazioni su spese, lavori deliberati e regolamento. In base ai casi possono essere rilevanti certificazioni, permessi, pratiche edilizie o ulteriori attestazioni.</p>\n<h2>Chi può verificare i documenti?</h2><p>Il notaio e i tecnici competenti sono i riferimenti per le verifiche giuridiche, catastali e urbanistiche. Chiedere per tempo quali controlli saranno necessari aiuta a pianificare tempi e passaggi successivi.</p>\n<p>Se stai pensando di vendere a Bari, un primo confronto può aiutarti a organizzare le informazioni sull'immobile e capire quali approfondimenti affidare ai professionisti.</p>",
+    "published": true,
+    "published_at": "2026-10-21T00:00:00+02:00"
+  }
+]
+$editorial$::jsonb) as a (
+    slug text, title text, category text, excerpt text,
+    cover_image_url text, body_html text,
+    published boolean, published_at timestamptz
+  )
+)
+insert into public.articles (
+  slug, title, category, excerpt, cover_image_url, body_html, published, published_at
+)
+select slug, title, category, excerpt, cover_image_url, body_html, published, published_at
+from initial_articles
+on conflict (slug) do nothing;
