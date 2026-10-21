@@ -132,6 +132,9 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+          <div className="hero__brand-panel" aria-hidden="true">
+            <img src="/Casa.webp" alt="" className="hero__brand-image" />
+          </div>
           <div className="hero__pagination" aria-label="Seleziona immagine principale">
             {heroSlides.map((item, index) => (
               <button
