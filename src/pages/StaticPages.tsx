@@ -208,7 +208,7 @@ export function ValuationPage() {
         description="Richiedi una prima valutazione del tuo appartamento, casa o locale a Bari. Compila il modulo con i dati essenziali e ti ricontatteremo."
         path="/valutazione"
       />
-      <PageHero eyebrow="" title="Quanto vale casa tua?" description="" />
+      <PageHero eyebrow="" title="Quanto vale casa tua?" description="Una prima valutazione gratuita per capire come valorizzare il tuo immobile a Bari, partendo dalle sue caratteristiche reali e dal contesto in cui si trova." />
       <ValuationSection />
     </>
   );
@@ -276,8 +276,10 @@ export function ValuationSection() {
           <div className="valuation-copy">
             <h2>Partiamo dalle informazioni essenziali.</h2>
             <p>
-              Ci vogliono pochi minuti per inviarci i dati principali. L’obiettivo è capire meglio
-              la tua proprietà e offrirti un primo confronto basato sulle sue caratteristiche.
+              Nessuna casa è uguale a un'altra. Oltre alla zona, una valutazione ragionata tiene
+              conto di metratura, piano, ascensore, condizioni interne, pertinenze e confronto
+              con immobili simili. Per iniziare bastano pochi minuti: raccontaci la tua proprietà
+              e approfondiremo insieme le informazioni utili.
             </p>
             <div className="process-list">
               <div>
@@ -313,7 +315,7 @@ export function ValuationSection() {
                 <Home size={22} />
               </span>
               <div>
-                <h2>Richiedi la valutazione gratuita</h2>
+                <h2>Richiedi una valutazione gratuita e senza impegno</h2>
                 <p>I campi con * sono obbligatori.</p>
               </div>
             </div>
@@ -579,42 +581,55 @@ export function PublishPage() {
       />
       <PageHero
         eyebrow="Pubblica con noi"
-        title="Il tuo immobile merita la giusta attenzione."
-        description="Conosciamo il territorio e possiamo aiutarti a valorizzare i punti di forza della tua proprietà con un percorso condiviso."
+        title="Vuoi vendere casa a Bari? Iniziamo dal progetto giusto."
+        description="Tu conosci la storia della tua casa. Noi ti aiutiamo a valorizzarla con una valutazione ragionata, una presentazione chiara e un percorso di vendita costruito insieme."
       />
       <section className="section">
         <div className="container publish-layout">
           <div>
             <span className="eyebrow">Dalla prima chiacchierata alla pubblicazione</span>
-            <h2>Un percorso pensato per il tuo immobile.</h2>
+            <h2>Una strategia chiara, dalla valutazione alle trattative.</h2>
+            <p>
+              Vendere casa non è soltanto scegliere un prezzo e pubblicare un annuncio.
+              Significa conoscere le caratteristiche dell'immobile, ascoltare i tuoi obiettivi
+              e preparare i passaggi necessari. Seguiamo con attenzione il territorio di Bari,
+              in particolare Carrassi, Picone e San Pasquale, senza formule uguali per tutti.
+            </p>
             <div className="process-list">
               <div>
                 <span>01</span>
                 <div>
-                  <strong>Ascoltiamo la tua esigenza</strong>
-                  <p>Ci racconti il tuo obiettivo, i tempi e le caratteristiche dell’immobile.</p>
+                  <strong>Analizziamo il tuo immobile</strong>
+                  <p>Ascoltiamo obiettivi e tempi, valutiamo la zona e consideriamo le caratteristiche che incidono sul prezzo.</p>
                 </div>
               </div>
               <div>
                 <span>02</span>
                 <div>
-                  <strong>Prepariamo la presentazione</strong>
+                  <strong>Costruiamo una presentazione efficace</strong>
                   <p>
-                    Raccogliamo informazioni, caratteristiche e materiali necessari a raccontarlo in
-                    modo chiaro.
+                    Raccogliamo informazioni, prepariamo immagini e descrizioni utili e valorizziamo
+                    gli aspetti che possono interessare i potenziali acquirenti.
                   </p>
                 </div>
               </div>
               <div>
                 <span>03</span>
                 <div>
-                  <strong>Definiamo la promozione</strong>
+                  <strong>Organizziamo promozione, visite e confronto</strong>
                   <p>
-                    Concordiamo insieme canali, tempistiche e attività di pubblicizzazione
-                    disponibili.
+                    Concordiamo canali e tempistiche, curiamo i contatti e ti affianchiamo
+                    nelle trattative, coordinandoci con i professionisti nelle fasi successive.
                   </p>
                 </div>
               </div>
+            </div>
+            <div className="seller-neighborhoods">
+              <strong>Un'attenzione particolare ai quartieri di Bari</strong>
+              <p>Carrassi, Picone e San Pasquale: una valutazione parte anche dal contesto e dalla microzona, senza generalizzazioni sui prezzi.</p>
+              <Link className="text-link" to="/guide/quanto-vale-un-appartamento-a-carrassi-nel-2026">
+                Come valutare un appartamento a Carrassi <ArrowRight size={16} />
+              </Link>
             </div>
             <div className="platforms-note">
               <strong>Canali di pubblicazione</strong>
@@ -728,6 +743,19 @@ export function PublishPage() {
               </p>
             )}
           </form>
+        </div>
+      </section>
+      <section className="section section--soft">
+        <div className="container seller-education">
+          <div>
+            <span className="eyebrow">Prima di vendere</span>
+            <h2>Informarsi è già un buon primo passo.</h2>
+            <p>Quali documenti servono? Conviene vendere da privato? Come si sceglie il prezzo di partenza?
+            Nel nostro magazine affrontiamo queste domande con esempi pratici e informazioni da approfondire.</p>
+          </div>
+          <Button component={Link} to="/guide" variant="outlined" endIcon={<ArrowRight size={17} />}>
+            Leggi le nostre guide
+          </Button>
         </div>
       </section>
     </>
