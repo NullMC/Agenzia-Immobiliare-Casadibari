@@ -7,6 +7,7 @@ import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
 import ElfsightReviews from '../components/ElfsightReviews';
 import { ValuationSection } from './StaticPages';
+import { MagazinePreview } from './BlogPages';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { demoFaqs, type Faq, type Property } from '../types';
 
@@ -116,7 +117,7 @@ export default function HomePage() {
                 </span>
               ))}
             </h1>
-            <p>Il tuo Partner di fiducia nel mondo immobiliare.</p>
+            <p>Dal 2001 al fianco di chi cerca, vende o valorizza casa a Bari. Un confronto concreto, una scelta più consapevole.</p>
             <div className="hero__actions">
               <Button
                 component={Link}
@@ -192,6 +193,31 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="seller-focus">
+        <div className="container seller-focus__inner">
+          <div className="seller-focus__copy">
+            <span className="eyebrow">Vuoi vendere casa a Bari?</span>
+            <h2>La tua casa merita un progetto, non soltanto un annuncio.</h2>
+            <p>
+              Una vendita ben preparata parte dall'ascolto: conosciamo l'immobile,
+              confrontiamo le sue caratteristiche con il mercato e definiamo come presentarlo
+              agli acquirenti più interessati, con attenzione alle zone di Carrassi, Picone e San Pasquale.
+            </p>
+            <div className="seller-focus__actions">
+              <Button component={Link} to="/valutazione" variant="contained" endIcon={<ArrowRight size={17} />}>
+                Richiedi una valutazione gratuita
+              </Button>
+              <Link to="/pubblica-con-noi" className="text-link">Scopri il nostro metodo <ArrowRight size={16} /></Link>
+            </div>
+          </div>
+          <div className="seller-focus__steps" aria-label="Come lavoriamo">
+            <div><span>01</span><strong>Valutiamo con criterio</strong><p>Zona, stato, spazi e immobili comparabili: ogni casa ha caratteristiche uniche.</p></div>
+            <div><span>02</span><strong>Presentiamo al meglio</strong><p>Immagini curate, informazioni chiare e una promozione scelta insieme.</p></div>
+            <div><span>03</span><strong>Ti affianchiamo</strong><p>Visite, trattative e coordinamento dei passaggi fino alla conclusione.</p></div>
+          </div>
+        </div>
+      </section>
+
       <ValuationSection />
 
       <section className="section story-section">
@@ -218,7 +244,7 @@ export default function HomePage() {
               accompagniamo con chiarezza, competenza e presenza, passo dopo passo.
             </p>
             <p>
-              Dal primo incontro alla consegna delle chiavi, lavoriamo per rendere il percorso più
+              Dalla prima valutazione alla consegna delle chiavi, lavoriamo per rendere il percorso più
               semplice e sereno.
             </p>
             <Link className="text-link" to="/chi-siamo">
@@ -269,6 +295,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <MagazinePreview />
 
       <section className="review-section section">
         <div className="container review-section__inner">
