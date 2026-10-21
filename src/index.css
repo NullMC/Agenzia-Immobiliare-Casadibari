@@ -4171,7 +4171,7 @@ h4 {
 
 /* Horizontal agency logo: retain its visible width while giving the header
    a compact intrinsic layout. Crop only transparent vertical image padding. */
-@media (min-width: 1101px) {
+@media (min-width: 1281px) {
   .site-header__inner {
     min-height: 0;
     padding-block: 6px;
@@ -4201,7 +4201,7 @@ h4 {
   .main-nav__link { font-size: 12px; }
   .site-header .nav-cta { white-space: nowrap; padding-inline: 11px; }
 }
-@media (min-width: 901px) and (max-width: 1100px) {
+@media (min-width: 901px) and (max-width: 1280px) {
   .site-header__inner { min-height: 0; padding-block: 5px; gap: 14px; }
   .site-header .brand {
     display: block;
