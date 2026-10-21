@@ -4169,31 +4169,30 @@ h4 {
 }
 
 
-/* Enlarged navigation identity and responsive, split homepage hero.
-   The square logo source has substantial transparent margins, so its displayed
-   height must grow with its width instead of constraining object-fit. */
+/* Horizontal agency logo: retain its visible width while giving the header
+   a compact intrinsic layout. Crop only transparent vertical image padding. */
 @media (min-width: 1101px) {
   .site-header__inner {
-    min-height: 230px;
+    min-height: 0;
+    padding-block: 6px;
     gap: 14px;
   }
   .site-header .brand {
     position: relative;
     display: block;
     width: 340px;
-    height: 220px;
+    height: 106px;
     overflow: hidden;
     flex: 0 0 340px;
   }
   .site-header .brand img {
     position: absolute;
-    top: -30px;
+    top: -12px;
     left: 0;
     width: 340px;
-    height: 340px;
+    height: auto;
     max-width: none;
     object-fit: contain;
-    object-position: center;
   }
   .main-nav {
     gap: clamp(8px, 1vw, 15px);
@@ -4203,21 +4202,21 @@ h4 {
   .site-header .nav-cta { white-space: nowrap; padding-inline: 11px; }
 }
 @media (min-width: 901px) and (max-width: 1100px) {
-  .site-header__inner { min-height: 190px; gap: 14px; }
+  .site-header__inner { min-height: 0; padding-block: 5px; gap: 14px; }
   .site-header .brand {
     display: block;
     position: relative;
     width: 292px;
-    height: 184px;
+    height: 92px;
     flex: 0 0 292px;
     overflow: hidden;
   }
   .site-header .brand img {
     position: absolute;
-    top: -26px;
+    top: -10px;
     left: 0;
     width: 292px;
-    height: 292px;
+    height: auto;
     max-width: none;
     object-fit: contain;
   }
@@ -4295,22 +4294,23 @@ h4 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 124px;
+    min-height: 0;
+    padding-block: 8px;
   }
   .site-header .brand {
     display: block;
     position: relative;
     width: 180px;
-    height: 116px;
+    height: 57px;
     flex: 0 0 180px;
     overflow: hidden;
   }
   .site-header .brand img {
     position: absolute;
-    top: -14px;
+    top: -6px;
     left: 0;
     width: 180px;
-    height: 180px;
+    height: auto;
     max-width: none;
     object-fit: contain;
   }
@@ -4351,16 +4351,16 @@ h4 {
   .hero__pagination { bottom: 68px; left: 0; }
 }
 @media (max-width: 480px) {
-  .site-header__inner { min-height: 108px; }
+  .site-header__inner { min-height: 0; padding-block: 8px; }
   .site-header .brand {
     width: 158px;
-    height: 100px;
+    height: 50px;
     flex-basis: 158px;
   }
   .site-header .brand img {
-    top: -12px;
+    top: -5px;
     width: 158px;
-    height: 158px;
+    height: auto;
   }
   .hero__content {
     min-height: 760px;
