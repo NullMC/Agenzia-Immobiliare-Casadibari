@@ -17,7 +17,7 @@ function formatDate(date: string | null) {
 }
 
 function useArticles() {
-  const [articles, setArticles] = useState<BlogArticle[]>(editorialArticles);
+  const [articles, setArticles] = useState<BlogArticle[]>(isSupabaseConfigured ? [] : editorialArticles);
   const [loading, setLoading] = useState(isSupabaseConfigured);
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -34,7 +34,7 @@ function useArticles() {
         if (!active) return;
         // Before the SQL migration, display initial editorial guides. Once the
         // table is available, it is the only source of truth (even when empty).
-        if (!error) setArticles((data || []) as BlogArticle[]);
+        setArticles(error ? editorialArticles : ((data || []) as BlogArticle[]));
         setLoading(false);
       });
     return () => { active = false; };
