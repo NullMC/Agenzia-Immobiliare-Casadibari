@@ -247,3 +247,28 @@ export function BlogArticlePage() {
     </>
   );
 }
+
+export function MagazinePreview() {
+  const { articles } = useArticles();
+  const preview = articles.slice(0, 3);
+  if (!preview.length) return null;
+  return (
+    <section className="section magazine-preview">
+      <div className="container">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Il magazine di Casadibari</span>
+            <h2>Conoscere il mercato aiuta a scegliere meglio.</h2>
+            <p>Guide e consigli per vendere casa a Bari, dalla valutazione ai documenti.</p>
+          </div>
+          <Button component={Link} to="/guide" variant="outlined" endIcon={<ArrowRight size={16} />}>
+            Tutte le guide
+          </Button>
+        </div>
+        <div className="magazine-grid magazine-grid--preview">
+          {preview.map((article) => <ArticleCard key={article.id} article={article} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
