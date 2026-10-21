@@ -92,7 +92,6 @@ export function BlogPage() {
       />
       <section className="magazine-intro">
         <div className="container magazine-intro__inner">
-          <span className="eyebrow eyebrow--light">Il magazine di Casadibari</span>
           <h1>Le scelte migliori iniziano dalle domande giuste.</h1>
           <p>
             Prezzi, documenti, strategie e quartieri: un punto di riferimento per
@@ -144,9 +143,8 @@ export function BlogPage() {
       <section className="magazine-bottom-cta">
         <div className="container magazine-bottom-cta__inner">
           <div>
-            <span className="eyebrow eyebrow--light">Dalle informazioni ai prossimi passi</span>
-            <h2>Hai una casa a Bari e stai pensando di venderla?</h2>
-            <p>Raccontaci dove si trova e quali sono i tuoi obiettivi: partiamo da un confronto concreto e senza impegno.</p>
+            <h2>Stai pensando di vendere casa?</h2>
+            <p>Raccontaci quali sono i tuoi obiettivi: partiamo da un confronto concreto e senza impegno.</p>
           </div>
           <Button component={Link} to="/valutazione" variant="contained" size="large" endIcon={<ArrowRight size={18} />}>
             Richiedi una valutazione
@@ -227,7 +225,6 @@ export function BlogArticlePage() {
               }}
             />
             <div className="magazine-article-cta">
-              <span className="eyebrow">Parliamo della tua casa</span>
               <h2>Ogni immobile ha una storia. Iniziamo dalla tua.</h2>
               <p>Hai dubbi sul valore, sui documenti o su come vendere? Ti ascoltiamo e valutiamo insieme i passi più utili.</p>
               <div className="magazine-article-cta__buttons">
@@ -265,7 +262,6 @@ export function MagazinePreview() {
       <div className="container">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">Il magazine di Casadibari</span>
             <h2>Conoscere il mercato aiuta a scegliere meglio.</h2>
             <p>Guide e consigli per vendere casa a Bari, dalla valutazione ai documenti.</p>
           </div>

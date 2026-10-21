@@ -172,7 +172,7 @@ export default function AdminArticles() {
       <div className="admin-section-heading">
         <div>
           <h2>Articoli e guide</h2>
-          <p>{articles.length} articoli · {articles.filter((item) => item.published).length} pubblicati. Gestisci testi, fotografie e link del magazine.</p>
+          <p>{articles.length} articoli · {articles.filter((item) => item.published).length} pubblicati. Gestisci testi, fotografie e link del blog.</p>
         </div>
         <Button type="button" variant="contained" onClick={clearForm} startIcon={<Plus size={16} />}>
           Nuovo articolo

@@ -121,15 +121,15 @@ export default function HomePage() {
             <div className="hero__actions">
               <Button
                 component={Link}
-                to="/immobili"
+                to="/valutazione"
                 variant="contained"
                 size="large"
                 endIcon={<ArrowRight size={18} />}
               >
-                Scopri gli immobili
-              </Button>
-              <Link className="hero__secondary-link" to="/valutazione">
                 Valuta la tua casa gratuitamente
+              </Button>
+              <Link className="hero__secondary-link" to="/immobili">
+                Scopri gli immobili
               </Link>
             </div>
           </div>
@@ -190,31 +190,6 @@ export default function HomePage() {
               </Button>
             </div>
           )}
-        </div>
-      </section>
-
-      <section className="seller-focus">
-        <div className="container seller-focus__inner">
-          <div className="seller-focus__copy">
-            <span className="eyebrow">Vuoi vendere casa a Bari?</span>
-            <h2>La tua casa merita un progetto, non soltanto un annuncio.</h2>
-            <p>
-              Una vendita ben preparata parte dall'ascolto: conosciamo l'immobile,
-              confrontiamo le sue caratteristiche con il mercato e definiamo come presentarlo
-              agli acquirenti più interessati, con attenzione alle zone di Carrassi, Picone e San Pasquale.
-            </p>
-            <div className="seller-focus__actions">
-              <Button component={Link} to="/valutazione" variant="contained" endIcon={<ArrowRight size={17} />}>
-                Richiedi una valutazione gratuita
-              </Button>
-              <Link to="/pubblica-con-noi" className="text-link">Scopri il nostro metodo <ArrowRight size={16} /></Link>
-            </div>
-          </div>
-          <div className="seller-focus__steps" aria-label="Come lavoriamo">
-            <div><span>01</span><strong>Valutiamo con criterio</strong><p>Zona, stato, spazi e immobili comparabili: ogni casa ha caratteristiche uniche.</p></div>
-            <div><span>02</span><strong>Presentiamo al meglio</strong><p>Immagini curate, informazioni chiare e una promozione scelta insieme.</p></div>
-            <div><span>03</span><strong>Ti affianchiamo</strong><p>Visite, trattative e coordinamento dei passaggi fino alla conclusione.</p></div>
-          </div>
         </div>
       </section>
 

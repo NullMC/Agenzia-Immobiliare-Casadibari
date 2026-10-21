@@ -587,7 +587,6 @@ export function PublishPage() {
       <section className="section">
         <div className="container publish-layout">
           <div>
-            <span className="eyebrow">Dalla prima chiacchierata alla pubblicazione</span>
             <h2>Una strategia chiara, dalla valutazione alle trattative.</h2>
             <p>
               Vendere casa non è soltanto scegliere un prezzo e pubblicare un annuncio.
