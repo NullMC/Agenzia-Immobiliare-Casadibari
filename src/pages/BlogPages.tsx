@@ -19,6 +19,7 @@ function formatDate(date: string | null) {
 function useArticles() {
   const [articles, setArticles] = useState<BlogArticle[]>(isSupabaseConfigured ? [] : editorialArticles);
   const [loading, setLoading] = useState(isSupabaseConfigured);
+  const [loadError, setLoadError] = useState(false);
   useEffect(() => {
     if (!isSupabaseConfigured) {
       setLoading(false);
@@ -32,14 +33,21 @@ function useArticles() {
       .order('published_at', { ascending: false })
       .then(({ data, error }) => {
         if (!active) return;
-        // Before the SQL migration, display initial editorial guides. Once the
-        // table is available, it is the only source of truth (even when empty).
-        setArticles(error ? editorialArticles : ((data || []) as BlogArticle[]));
+        // A missing table means the initial migration has not yet been applied.
+        // Other errors must not resurrect articles removed or unpublished by the admin.
+        if (error) {
+          const missingTable = ['42P01', 'PGRST205'].includes(error.code);
+          setArticles(missingTable ? editorialArticles : []);
+          setLoadError(!missingTable);
+        } else {
+          setArticles((data || []) as BlogArticle[]);
+          setLoadError(false);
+        }
         setLoading(false);
       });
     return () => { active = false; };
   }, []);
-  return { articles, loading };
+  return { articles, loading, loadError };
 }
 
 function ArticleCard({ article }: { article: BlogArticle }) {
@@ -67,7 +75,7 @@ function ArticleCard({ article }: { article: BlogArticle }) {
 }
 
 export function BlogPage() {
-  const { articles, loading } = useArticles();
+  const { articles, loading, loadError } = useArticles();
   const [category, setCategory] = useState('Tutte');
   const categories = useMemo(
     () => ['Tutte', ...Array.from(new Set(articles.map((article) => article.category)))],
@@ -127,8 +135,8 @@ export function BlogPage() {
           ) : (
             <div className="empty-state">
               <Home size={28} />
-              <h3>{loading ? 'Caricamento articoli…' : 'Nessun articolo in questa sezione'}</h3>
-              <p>Scopri le altre guide o torna a trovarci presto.</p>
+              <h3>{loading ? 'Caricamento articoli…' : loadError ? 'Guide temporaneamente non disponibili' : 'Nessun articolo in questa sezione'}</h3>
+              <p>{loadError ? 'Riprova fra qualche minuto.' : 'Scopri le altre guide o torna a trovarci presto.'}</p>
             </div>
           )}
         </div>
