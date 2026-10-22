@@ -53,7 +53,7 @@ export default function SiteLayout() {
   const navItems = [
     { to: '/', label: 'Home', end: true },
     { to: '/immobili', label: 'Immobili' },
-    { to: '/valutazione', label: 'Valuta il tuo immobile' },
+    { to: '/valutazione', label: 'Valutazione immobiliare gratuita' },
     { to: '/chi-siamo', label: 'Chi siamo' },
     { to: '/consulenza-mutui', label: 'Mutui e prestiti' },
   ];
