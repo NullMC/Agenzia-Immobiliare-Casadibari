@@ -7,6 +7,7 @@ import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
 import ElfsightReviews from '../components/ElfsightReviews';
 import { ValuationSection } from './StaticPages';
+import { MagazinePreview } from './BlogPages';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { demoFaqs, type Faq, type Property } from '../types';
 
@@ -116,21 +117,24 @@ export default function HomePage() {
                 </span>
               ))}
             </h1>
-            <p>Il tuo Partner di fiducia nel mondo immobiliare.</p>
+            <p>Dal 2001 al fianco di chi cerca, vende o valorizza casa a Bari. Un confronto concreto, una scelta più consapevole.</p>
             <div className="hero__actions">
               <Button
                 component={Link}
-                to="/immobili"
+                to="/valutazione"
                 variant="contained"
                 size="large"
                 endIcon={<ArrowRight size={18} />}
               >
-                Scopri gli immobili
-              </Button>
-              <Link className="hero__secondary-link" to="/valutazione">
                 Valuta la tua casa gratuitamente
+              </Button>
+              <Link className="hero__secondary-link" to="/immobili">
+                Scopri gli immobili
               </Link>
             </div>
+          </div>
+          <div className="hero__brand-panel" aria-hidden="true">
+            <img src="/Casa.webp" alt="" className="hero__brand-image" />
           </div>
           <div className="hero__pagination" aria-label="Seleziona immagine principale">
             {heroSlides.map((item, index) => (
@@ -215,7 +219,7 @@ export default function HomePage() {
               accompagniamo con chiarezza, competenza e presenza, passo dopo passo.
             </p>
             <p>
-              Dal primo incontro alla consegna delle chiavi, lavoriamo per rendere il percorso più
+              Dalla prima valutazione alla consegna delle chiavi, lavoriamo per rendere il percorso più
               semplice e sereno.
             </p>
             <Link className="text-link" to="/chi-siamo">
@@ -266,6 +270,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <MagazinePreview />
 
       <section className="review-section section">
         <div className="container review-section__inner">

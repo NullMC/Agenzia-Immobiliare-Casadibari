@@ -188,7 +188,7 @@ export default function PropertiesPage() {
               <BellRing size={23} />
             </span>
             <span className="eyebrow">Rimani aggiornato</span>
-            <h2>La prossima casa potrebbe arrivare domani.</h2>
+            <h2>La prossima occasione potrebbe arrivare da un momento all'altro</h2>
             <p>
               Salva le tue preferenze: quando una nuova disponibilità corrisponde alla ricerca,
               riceverai un’email con fino a tre proposte pertinenti.
