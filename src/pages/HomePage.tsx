@@ -128,9 +128,16 @@ export default function HomePage() {
               >
                 Valuta la tua casa gratuitamente
               </Button>
-              <Link className="hero__secondary-link" to="/immobili">
+              <Button
+                component={Link}
+                to="/immobili"
+                variant="outlined"
+                color="primary"
+                size="large"
+                className="hero__secondary-cta"
+              >
                 Scopri gli immobili
-              </Link>
+              </Button>
             </div>
           </div>
           <div className="hero__brand-panel" aria-hidden="true">
