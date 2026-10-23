@@ -30,11 +30,27 @@ function useArticles() {
       .from('articles')
       .select('*')
       .eq('published', true)
+      .order('sort_order', { ascending: true })
       .order('published_at', { ascending: false })
-      .then(({ data, error }) => {
+      .order('created_at', { ascending: false })
+      .then(async (result) => {
+        let { data, error } = result;
+
+        // Il sito pubblico rimane disponibile anche se la migrazione del nuovo
+        // ordine non e stata ancora eseguita. La vecchia ordinazione e temporanea.
+        if (error && (error.code === '42703' || error.message.includes('sort_order'))) {
+          const legacy = await supabase
+            .from('articles')
+            .select('*')
+            .eq('published', true)
+            .order('published_at', { ascending: false })
+            .order('created_at', { ascending: false });
+          data = legacy.data;
+          error = legacy.error;
+        }
+
         if (!active) return;
-        // A missing table means the initial migration has not yet been applied.
-        // Other errors must not resurrect articles removed or unpublished by the admin.
+        // Solo una tabella articoli mancante abilita le guide editoriali statiche.
         if (error) {
           const missingTable = ['42P01', 'PGRST205'].includes(error.code);
           setArticles(missingTable ? editorialArticles : []);
