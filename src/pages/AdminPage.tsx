@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
 import {
@@ -6,6 +6,8 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  ArrowUp,
+  ArrowDown,
   CirclePlus,
   ClipboardList,
   FileText,
@@ -51,6 +53,18 @@ type PropertyForm = {
   featured: boolean;
   published: boolean;
 };
+type PhotoEntry =
+  | { kind: 'existing'; key: string; image: PropertyImage }
+  | { kind: 'new'; key: string; file: File; previewUrl: string };
+
+function sortPropertyPhotos(images: PropertyImage[]): PropertyImage[] {
+  return [...images].sort(
+    (a, b) =>
+      (a.sort_order ?? 0) - (b.sort_order ?? 0) ||
+      (a.id || a.public_url).localeCompare(b.id || b.public_url),
+  );
+}
+
 type TeamForm = {
   full_name: string;
   role: string;
@@ -172,8 +186,18 @@ export default function AdminPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [propertyForm, setPropertyForm] = useState<PropertyForm>(blankProperty);
-  const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+  // One ordered list for both uploaded and not-yet-uploaded photographs.
+  const [photoEntries, setPhotoEntries] = useState<PhotoEntry[]>([]);
+  const photoPreviews = useRef<Set<string>>(new Set());
   const [propertySaving, setPropertySaving] = useState(false);
+
+  useEffect(() => {
+    const previews = photoPreviews.current;
+    return () => {
+      previews.forEach((url) => URL.revokeObjectURL(url));
+      previews.clear();
+    };
+  }, []);
 
   const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
   const [faqForm, setFaqForm] = useState({ question: '', answer: '', published: true });
@@ -326,11 +350,46 @@ export default function AdminPage() {
     setLoginError('Hai effettuato la disconnessione.');
   };
 
+  const clearPhotoPreviews = () => {
+    photoPreviews.current.forEach((url) => URL.revokeObjectURL(url));
+    photoPreviews.current.clear();
+  };
+
   const startNewProperty = () => {
+    clearPhotoPreviews();
     setEditingId(null);
     setPropertyForm({ ...blankProperty });
-    setSelectedPhotos([]);
+    setPhotoEntries([]);
     setNotice('');
+  };
+
+  const addPhotos = (fileList: FileList | null) => {
+    if (!fileList) return;
+    const files = Array.from(fileList);
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+    const accepted = files.filter((file) => allowed.includes(file.type) && file.size <= 12 * 1024 * 1024);
+    if (accepted.length !== files.length) {
+      setNotice('Alcuni file non sono stati aggiunti: usa JPEG, PNG, WEBP o AVIF (massimo 12 MB ciascuno).');
+    }
+    const added: PhotoEntry[] = accepted.map((file) => {
+      const previewUrl = URL.createObjectURL(file);
+      photoPreviews.current.add(previewUrl);
+      return { kind: 'new', key: crypto.randomUUID(), file, previewUrl };
+    });
+    setPhotoEntries((current) => [...current, ...added]);
+  };
+
+  const movePhoto = (from: number, to: number) => {
+    setPhotoEntries((current) => {
+      if (
+        from < 0 || to < 0 || from >= current.length ||
+        to >= current.length || from === to
+      ) return current;
+      const next = [...current];
+      const [item] = next.splice(from, 1);
+      next.splice(to, 0, item);
+      return next;
+    });
   };
   const editProperty = (property: Property) => {
     setEditingId(property.id);
@@ -355,7 +414,14 @@ export default function AdminPage() {
       featured: Boolean(property.featured),
       published: Boolean(property.published),
     });
-    setSelectedPhotos([]);
+    clearPhotoPreviews();
+    setPhotoEntries(
+      sortPropertyPhotos(property.property_images || []).map((image) => ({
+        kind: 'existing' as const,
+        key: image.id || image.public_url,
+        image,
+      })),
+    );
     setNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -369,7 +435,11 @@ export default function AdminPage() {
     }
     setPropertySaving(true);
     const payload = {
-      slug: slugify(propertyForm.title) || 'immobile-' + Date.now(),
+      // Keep existing URLs stable when saving only the order of the media.
+      slug: editingId
+        ? (properties.find((property) => property.id === editingId)?.slug ||
+          slugify(propertyForm.title))
+        : (slugify(propertyForm.title) || 'immobile-' + Date.now()),
       title: propertyForm.title.trim(),
       subtitle: propertyForm.subtitle.trim(),
       description_html: propertyForm.description_html,
@@ -413,60 +483,96 @@ export default function AdminPage() {
       return;
     }
 
-    const imageRows: {
-      property_id: string;
-      storage_path: string;
-      public_url: string;
-      alt_text: string;
-      sort_order: number;
-    }[] = [];
-    for (let index = 0; index < selectedPhotos.length; index += 1) {
-      const photo = selectedPhotos[index];
-      if (!photo.type.startsWith('image/')) continue;
+    // Store the final sequence in property_images.sort_order. The database already
+    // has this field and admin UPDATE permissions; no additional migration is needed.
+    // Items are saved in order, so both existing and newly added photos can be
+    // selected as the property's cover image.
+    const persistedEntries = [...photoEntries];
+    for (let index = 0; index < persistedEntries.length; index += 1) {
+      const entry = persistedEntries[index];
+
+      if (entry.kind === 'existing') {
+        if (!entry.image.id) {
+          writeError = 'Impossibile identificare una fotografia già salvata.';
+          break;
+        }
+        if (entry.image.sort_order === index) continue;
+        const { error } = await supabase
+          .from('property_images')
+          .update({ sort_order: index })
+          .eq('id', entry.image.id)
+          .eq('property_id', propertyId);
+        if (error) {
+          writeError = 'Annuncio salvato, ma riordino delle immagini non riuscito: ' + error.message;
+          break;
+        }
+        persistedEntries[index] = {
+          ...entry,
+          image: { ...entry.image, sort_order: index },
+        };
+        continue;
+      }
+
       const path =
-        propertyId +
-        '/' +
-        Date.now() +
-        '-' +
-        index +
-        '-' +
-        photo.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+        propertyId + '/' + Date.now() + '-' + index + '-' +
+        entry.file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
       const { error: uploadError } = await supabase.storage
         .from('property-images')
-        .upload(path, photo, { upsert: false, contentType: photo.type });
+        .upload(path, entry.file, {
+          upsert: false,
+          contentType: entry.file.type,
+        });
       if (uploadError) {
-        writeError = 'Immobile salvato ma upload immagine non riuscito: ' + uploadError.message;
+        writeError = 'Annuncio salvato, ma caricamento foto non riuscito: ' + uploadError.message;
         break;
       }
+
       const publicUrl = supabase.storage.from('property-images').getPublicUrl(path).data.publicUrl;
-      imageRows.push({
-        property_id: propertyId,
-        storage_path: path,
-        public_url: publicUrl,
-        alt_text: propertyForm.title,
-        sort_order:
-          (properties.find((p) => p.id === propertyId)?.property_images?.length || 0) + index,
-      });
-    }
-    if (imageRows.length) {
-      const { error } = await supabase.from('property_images').insert(imageRows);
-      if (error)
+      const { data, error: associationError } = await supabase
+        .from('property_images')
+        .insert({
+          property_id: propertyId,
+          storage_path: path,
+          public_url: publicUrl,
+          alt_text: propertyForm.title,
+          sort_order: index,
+        })
+        .select('id, storage_path, public_url, alt_text, sort_order')
+        .single();
+      if (associationError || !data) {
+        await supabase.storage.from('property-images').remove([path]);
         writeError =
-          'Immobile salvato, ma non è stato possibile associare tutte le foto: ' + error.message;
+          'Annuncio salvato, ma associazione della foto non riuscita: ' +
+          (associationError?.message || 'record non disponibile');
+        break;
+      }
+
+      // Convert successfully uploaded files to existing photos. In the event of
+      // a partial failure, saving again will not upload duplicates.
+      photoPreviews.current.delete(entry.previewUrl);
+      URL.revokeObjectURL(entry.previewUrl);
+      persistedEntries[index] = {
+        kind: 'existing',
+        key: data.id,
+        image: data as PropertyImage,
+      };
     }
+
     await loadData();
     setPropertySaving(false);
-    setSelectedPhotos([]);
-    if (writeError) setNotice(writeError);
-    else {
-      setNotice(
-        propertyForm.published
-          ? 'Annuncio salvato e pubblicato.'
-          : 'Bozza salvata. Pubblica l’annuncio selezionando la casella dedicata.',
-      );
-      startNewProperty();
-      setNotice(propertyForm.published ? 'Annuncio salvato e pubblicato.' : 'Bozza salvata.');
+    if (writeError) {
+      setPhotoEntries(persistedEntries);
+      setEditingId(propertyId);
+      setNotice(writeError + ' Le modifiche già salvate restano disponibili: correggi e riprova.');
+      return;
     }
+
+    startNewProperty();
+    setNotice(
+      propertyForm.published
+        ? 'Annuncio pubblicato. Ordine delle foto e copertina aggiornati.'
+        : 'Bozza salvata. Ordine delle foto aggiornato.',
+    );
   };
 
   const deleteProperty = async (property: Property) => {
@@ -481,13 +587,29 @@ export default function AdminPage() {
     await loadData();
   };
 
-  const deleteImage = async (image: PropertyImage) => {
-    if (!image.id || !window.confirm('Rimuovere questa foto dall’annuncio?')) return;
-    const { error } = await supabase.from('property_images').delete().eq('id', image.id);
-    if (!error && image.storage_path)
-      await supabase.storage.from('property-images').remove([image.storage_path]);
-    if (error) setNotice('Impossibile eliminare la foto: ' + error.message);
+  const deleteImage = async (entry: PhotoEntry) => {
+    if (propertySaving) return;
+    if (entry.kind === 'new') {
+      photoPreviews.current.delete(entry.previewUrl);
+      URL.revokeObjectURL(entry.previewUrl);
+      setPhotoEntries((current) => current.filter((item) => item.key !== entry.key));
+      return;
+    }
+    if (!entry.image.id || !window.confirm('Rimuovere questa foto dall’annuncio?')) return;
+    const { error } = await supabase
+      .from('property_images')
+      .delete()
+      .eq('id', entry.image.id);
+    if (error) {
+      setNotice('Impossibile eliminare la foto: ' + error.message);
+      return;
+    }
+    setPhotoEntries((current) => current.filter((item) => item.key !== entry.key));
+    if (entry.image.storage_path) {
+      await supabase.storage.from('property-images').remove([entry.image.storage_path]);
+    }
     await loadData();
+    setNotice('Foto eliminata. Salva l’annuncio per confermare il nuovo ordine.');
   };
 
   const saveFaq = async (event: React.FormEvent) => {
@@ -670,8 +792,7 @@ export default function AdminPage() {
   const newRequestCount =
     valuations.filter((item) => item.status === 'new').length +
     contacts.filter((item) => item.status === 'new').length;
-  const currentImages =
-    properties.find((property) => property.id === editingId)?.property_images || [];
+  const currentImages = photoEntries;
 
   return (
     <div className="admin-app">
@@ -998,62 +1119,115 @@ export default function AdminPage() {
                   <small>Usa grassetto, titoli, elenchi e link per strutturare il testo.</small>
                 </div>
                 <div className="admin-field-block">
-                  <span className="admin-field-label">Fotografie</span>
+                  <span className="admin-field-label">Fotografie e ordine di visualizzazione</span>
+                  <p className="admin-media-description">
+                    Scegli la posizione di ogni immagine. La <strong>foto 1</strong> sarà
+                    la copertina dell’annuncio, sia negli elenchi sia nell’anteprima
+                    del carosello. Puoi riordinare anche le nuove foto prima di caricarle.
+                  </p>
                   <label className="upload-drop">
                     <ImagePlus size={23} />
                     <span>
-                      <strong>Seleziona foto dal computer</strong>
+                      <strong>Aggiungi foto dal computer</strong>
                       <small>JPEG, PNG, WEBP o AVIF · massimo 12 MB per file</small>
                     </span>
                     <input
                       type="file"
                       multiple
+                      disabled={propertySaving}
                       accept="image/jpeg,image/png,image/webp,image/avif"
-                      onChange={(e) => setSelectedPhotos(Array.from(e.target.files || []))}
+                      onChange={(event) => {
+                        addPhotos(event.target.files);
+                        event.target.value = '';
+                      }}
                     />
                   </label>
-                  {selectedPhotos.length > 0 && (
-                    <div className="selected-files">
-                      {selectedPhotos.map((file) => (
-                        <span key={file.name + file.size}>
-                          {file.name}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSelectedPhotos((current) =>
-                                current.filter((item) => item !== file),
-                              )
-                            }
-                            aria-label={'Rimuovi ' + file.name}
-                          >
-                            <X size={13} />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {currentImages.length > 0 && (
-                    <div className="admin-photo-grid">
-                      {currentImages
-                        .slice()
-                        .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
-                        .map((image, index) => (
-                          <div key={image.id || image.public_url}>
+                  {currentImages.length > 0 ? (
+                    <div className="admin-media-order" aria-label="Ordine delle fotografie">
+                      {currentImages.map((entry, index) => (
+                        <div className="admin-media-item" key={entry.key}>
+                          <div className="admin-media-item__preview">
                             <img
-                              src={image.public_url}
-                              alt={image.alt_text || 'Foto annuncio ' + (index + 1)}
+                              src={
+                                entry.kind === 'existing'
+                                  ? entry.image.public_url
+                                  : entry.previewUrl
+                              }
+                              alt={'Foto ' + (index + 1) + ' dell’annuncio'}
                             />
+                            <span className={index === 0 ? 'is-cover' : ''}>
+                              {index === 0 ? 'COPERTINA' : 'FOTO ' + (index + 1)}
+                            </span>
+                          </div>
+                          <div className="admin-media-item__details">
+                            <strong>
+                              {entry.kind === 'new'
+                                ? entry.file.name
+                                : entry.image.alt_text || 'Immagine già caricata'}
+                            </strong>
+                            <small>
+                              {entry.kind === 'new' ? 'Da caricare al salvataggio' : 'Già pubblicata'}
+                            </small>
+                            <label className="admin-media-item__position">
+                              <span>Posizione</span>
+                              <select
+                                value={index}
+                                disabled={propertySaving}
+                                onChange={(event) =>
+                                  movePhoto(index, Number(event.target.value))
+                                }
+                                aria-label={'Posizione immagine ' + (index + 1)}
+                              >
+                                {currentImages.map((_item, position) => (
+                                  <option key={position} value={position}>
+                                    {position + 1}{position === 0 ? ' — Copertina' : ''}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          </div>
+                          <div className="admin-media-item__actions">
                             <button
                               type="button"
-                              onClick={() => void deleteImage(image)}
-                              aria-label="Elimina foto"
+                              disabled={propertySaving || index === 0}
+                              onClick={() => movePhoto(index, index - 1)}
+                              aria-label={'Sposta foto ' + (index + 1) + ' in alto'}
+                              title="Sposta in alto"
                             >
-                              <Trash2 size={14} />
+                              <ArrowUp size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={propertySaving || index === currentImages.length - 1}
+                              onClick={() => movePhoto(index, index + 1)}
+                              aria-label={'Sposta foto ' + (index + 1) + ' in basso'}
+                              title="Sposta in basso"
+                            >
+                              <ArrowDown size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              className="admin-media-item__delete"
+                              disabled={propertySaving}
+                              onClick={() => void deleteImage(entry)}
+                              aria-label={'Rimuovi foto ' + (index + 1)}
+                              title="Rimuovi foto"
+                            >
+                              <Trash2 size={16} />
                             </button>
                           </div>
-                        ))}
+                        </div>
+                      ))}
                     </div>
+                  ) : (
+                    <p className="admin-media-empty">
+                      Ancora nessuna foto. Aggiungi delle immagini per scegliere la copertina.
+                    </p>
                   )}
+                  <small>
+                    L’ordine scelto viene applicato quando premi «Salva annuncio».
+                    Le immagini già caricate non vengono ricaricate.
+                  </small>
                 </div>
                 <div className="admin-publish-options">
                   <label className="check-field">
@@ -1115,7 +1289,7 @@ export default function AdminPage() {
                         <div className="admin-property-cell">
                           <img
                             src={
-                              property.property_images?.[0]?.public_url ||
+                              sortPropertyPhotos(property.property_images || [])[0]?.public_url ||
                               '/Logo%20Agenzia%20Casadibari.webp'
                             }
                             alt=""
