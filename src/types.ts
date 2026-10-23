@@ -8,6 +8,8 @@ export interface BlogArticle {
   cover_image_url: string;
   published: boolean;
   published_at: string | null;
+  /** Posizione manuale nel magazine; le posizioni minori vengono mostrate per prime. */
+  sort_order?: number;
   created_at?: string;
   updated_at?: string;
 }
