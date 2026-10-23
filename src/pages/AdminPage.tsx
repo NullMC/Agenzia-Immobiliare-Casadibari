@@ -27,6 +27,7 @@ import {
 import { Alert, Button, IconButton, TextField } from '@mui/material';
 import Seo from '../components/Seo';
 import RichTextEditor from '../components/RichTextEditor';
+import '../property-media.css';
 import AdminArticles from '../components/AdminArticles';
 import { supabase } from '../lib/supabase';
 import type { ContactSettings, Faq, Property, PropertyImage, TeamMember } from '../types';
