@@ -9,7 +9,10 @@ import type { BlogArticle } from '../types';
 type ArticleForm = Pick<
   BlogArticle,
   'title' | 'slug' | 'excerpt' | 'category' | 'body_html' | 'cover_image_url' | 'published'
->;
+> & {
+  /** Zero means append at the end of the article list. */
+  position: number;
+};
 
 const emptyForm: ArticleForm = {
   title: '',
@@ -19,6 +22,7 @@ const emptyForm: ArticleForm = {
   body_html: '<p></p>',
   cover_image_url: '',
   published: false,
+  position: 0,
 };
 
 function slugify(value: string) {
@@ -54,10 +58,12 @@ export default function AdminArticles() {
     const { data, error } = await supabase
       .from('articles')
       .select('*')
+      .order('sort_order', { ascending: true })
+      .order('published_at', { ascending: false })
       .order('created_at', { ascending: false });
     if (error) {
       setLoadError(
-        'Impossibile caricare gli articoli. Verifica di aver applicato la migrazione SQL degli articoli su Supabase. Dettaglio: ' + error.message,
+        'Impossibile caricare gli articoli. Applica prima le migrazioni Supabase del magazine e dell’ordinamento manuale (202610230001_article_manual_order.sql). Dettaglio: ' + error.message,
       );
     } else {
       setLoadError('');
@@ -84,6 +90,7 @@ export default function AdminArticles() {
       body_html: article.body_html,
       cover_image_url: article.cover_image_url,
       published: article.published,
+      position: articles.findIndex((item) => item.id === article.id) + 1,
     });
     setMessage('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -130,6 +137,15 @@ export default function AdminArticles() {
       setMessage('L’indirizzo della copertina deve essere un link HTTP/HTTPS o un percorso interno.');
       return;
     }
+
+    // A moving article is temporarily removed from the choices before we
+    // calculate its new insertion point. Drafts are included in this list.
+    const othersCount = articles.filter((article) => article.id !== editingId).length;
+    const requestedPosition =
+      form.position === 0
+        ? othersCount + 1
+        : Math.max(1, Math.min(form.position, othersCount + 1));
+
     setSaving(true);
     const old = articles.find((article) => article.id === editingId);
     const payload = {
@@ -142,16 +158,43 @@ export default function AdminArticles() {
       published: form.published,
       published_at: form.published ? old?.published_at || new Date().toISOString() : null,
     };
-    const { error } = editingId
-      ? await supabase.from('articles').update(payload).eq('id', editingId)
-      : await supabase.from('articles').insert(payload);
-    setSaving(false);
-    if (error) {
-      setMessage('Salvataggio non riuscito: ' + error.message);
+
+    const result = editingId
+      ? await supabase.from('articles').update(payload).eq('id', editingId).select('id').single()
+      : await supabase.from('articles').insert(payload).select('id').single();
+
+    if (result.error || !result.data?.id) {
+      setSaving(false);
+      setMessage('Salvataggio non riuscito: ' + (result.error?.message || 'ID articolo non disponibile.'));
       return;
     }
+
+    const savedId = result.data.id as string;
+    const { error: positionError } = await supabase.rpc('move_article_to_position', {
+      p_article_id: savedId,
+      p_position: requestedPosition,
+    });
+    setSaving(false);
+
+    if (positionError) {
+      // Article content has already been saved: keep the form in edit mode so
+      // retrying the order won't accidentally create a duplicate article.
+      setEditingId(savedId);
+      setMessage(
+        'Testo salvato, ma non è stato possibile applicare l’ordine: ' +
+          positionError.message +
+          '. Verifica la migrazione 202610230001_article_manual_order.sql e riprova.',
+      );
+      await load();
+      return;
+    }
+
     clearForm();
-    setMessage(payload.published ? 'Articolo pubblicato e salvato.' : 'Bozza articolo salvata.');
+    setMessage(
+      payload.published
+        ? 'Articolo pubblicato e ordine aggiornato.'
+        : 'Bozza salvata e ordine aggiornato.',
+    );
     await load();
   }
 
@@ -167,12 +210,17 @@ export default function AdminArticles() {
     await load();
   }
 
+  const otherArticles = articles.filter((article) => article.id !== editingId);
+  const positionsCount = otherArticles.length + 1;
+  const selectedPosition =
+    form.position === 0 ? positionsCount : Math.max(1, Math.min(form.position, positionsCount));
+
   return (
     <section>
       <div className="admin-section-heading">
         <div>
           <h2>Articoli e guide</h2>
-          <p>{articles.length} articoli · {articles.filter((item) => item.published).length} pubblicati. Gestisci testi, fotografie e link del blog.</p>
+          <p>{articles.length} articoli · {articles.filter((item) => item.published).length} pubblicati. Scegli anche l’ordine delle card nel sito.</p>
         </div>
         <Button type="button" variant="contained" onClick={clearForm} startIcon={<Plus size={16} />}>
           Nuovo articolo
@@ -213,6 +261,32 @@ export default function AdminArticles() {
             />
           </label>
           <label className="field">
+            <span>Ordine di visualizzazione</span>
+            <select
+              value={selectedPosition}
+              onChange={(e) =>
+                setForm((current) => ({ ...current, position: Number(e.target.value) }))
+              }
+              aria-describedby="magazine-position-help"
+            >
+              {Array.from({ length: positionsCount }, (_, index) => {
+                const precedingArticle = otherArticles[index - 1];
+                const position = index + 1;
+                const description =
+                  index === 0
+                    ? 'In prima posizione'
+                    : index === otherArticles.length
+                      ? 'In ultima posizione'
+                      : 'Dopo: ' + precedingArticle.title;
+                return (
+                  <option key={position} value={position}>
+                    {position} — {description}
+                  </option>
+                );
+              })}
+            </select>
+          </label>
+          <label className="field field--wide">
             <span>Indirizzo articolo (slug)</span>
             <input
               value={form.slug}
@@ -233,6 +307,11 @@ export default function AdminArticles() {
             />
           </label>
         </div>
+        <small id="magazine-position-help" className="small-note">
+          La prima posizione compare per prima in «Guide e consigli» e nell’anteprima della homepage.
+          Quando salvi, le altre card si riordinano automaticamente. Le bozze partecipano all’ordine,
+          ma non sono visibili ai visitatori.
+        </small>
         <small id="magazine-slug-note" className="small-note">
           Per mantenere i collegamenti esistenti, evita di modificare lo slug di un articolo già pubblicato.
         </small>
@@ -296,17 +375,17 @@ export default function AdminArticles() {
 
       <div className="admin-table-card">
         <div className="admin-table-heading">
-          <h3>Articoli presenti</h3><span>{articles.length} totali</span>
+          <h3>Articoli nell’ordine del sito</h3><span>{articles.length} totali</span>
         </div>
         {loading ? (
           <p className="admin-loading-inline">Caricamento articoli…</p>
         ) : articles.length ? (
           <div className="magazine-admin-list">
-            {articles.map((article) => (
+            {articles.map((article, index) => (
               <div className="magazine-admin-item" key={article.id}>
                 <img src={article.cover_image_url || '/VetrinaEsterna.webp'} alt="" loading="lazy" />
                 <div>
-                  <small>{article.category}</small>
+                  <small>Posizione {index + 1} · {article.category}</small>
                   <strong>{article.title}</strong>
                   <span className={'admin-visibility ' + (article.published ? 'is-published' : '')}>
                     {article.published ? 'Pubblicato' : 'Bozza'}
