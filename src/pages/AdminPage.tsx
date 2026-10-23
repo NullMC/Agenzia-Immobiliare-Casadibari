@@ -145,6 +145,14 @@ function slugify(value: string) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
+
+/** Retry only duplicate property slugs; other database constraints must still fail. */
+function isPropertySlugConflict(error: { code?: string; message?: string; details?: string } | null) {
+  return (
+    error?.code === '23505' &&
+    /properties_slug_key|\bslug\b/i.test([error.message, error.details].join(' '))
+  );
+}
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString('it-IT', {
     day: '2-digit',
@@ -436,11 +444,11 @@ export default function AdminPage() {
     }
     setPropertySaving(true);
     const payload = {
-      // Keep existing URLs stable when saving only the order of the media.
+      // Never change an existing listing URL when editing its information or photos.
       slug: editingId
         ? (properties.find((property) => property.id === editingId)?.slug ||
           slugify(propertyForm.title))
-        : (slugify(propertyForm.title) || 'immobile-' + Date.now()),
+        : (slugify(propertyForm.title) || 'immobile'),
       title: propertyForm.title.trim(),
       subtitle: propertyForm.subtitle.trim(),
       description_html: propertyForm.description_html,
@@ -470,13 +478,31 @@ export default function AdminPage() {
       const { error } = await supabase.from('properties').update(payload).eq('id', editingId);
       if (error) writeError = error.message;
     } else {
-      const { data, error } = await supabase
-        .from('properties')
-        .insert(payload)
-        .select('id')
-        .single();
-      if (error) writeError = error.message;
-      else propertyId = data.id;
+      // Several properties can have the same title. Try the readable title slug
+      // first, then add a unique suffix if another record already uses it.
+      // The database UNIQUE constraint protects concurrent admin submissions.
+      const baseSlug = payload.slug;
+      for (let attempt = 0; attempt < 4; attempt += 1) {
+        const uniqueSlug =
+          attempt === 0 ? baseSlug : baseSlug + '-' + crypto.randomUUID().slice(0, 8);
+        const { data, error } = await supabase
+          .from('properties')
+          .insert({ ...payload, slug: uniqueSlug })
+          .select('id')
+          .single();
+
+        if (!error && data) {
+          propertyId = data.id;
+          break;
+        }
+
+        if (isPropertySlugConflict(error) && attempt < 3) continue;
+
+        writeError = isPropertySlugConflict(error)
+          ? 'Impossibile assegnare un indirizzo univoco all’annuncio. Riprova il salvataggio.'
+          : error?.message || 'Creazione annuncio non riuscita.';
+        break;
+      }
     }
     if (writeError || !propertyId) {
       setNotice('Salvataggio non riuscito: ' + (writeError || 'ID dell’immobile non disponibile.'));
