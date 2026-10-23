@@ -12,7 +12,7 @@ Dopo **Salva articolo** o **Aggiorna articolo**, tutte le posizioni vengono risi
 
 L'ordine viene applicato a:
 1. La griglia **Guide e consigli** (`/guide`) e i suoi filtri per categoria.
-2. L'anteprima degli **ultimi tre articoli selezionati** nella homepage (i primi tre articoli pubblicati dell'ordine scelto).
+2. L'anteprima dei **primi tre articoli pubblicati** secondo l'ordine scelto nella homepage.
 3. I link agli articoli correlati nelle pagine delle guide.
 
 Le **bozze** partecipano all'ordinamento amministrativo ma non sono visibili pubblicamente. Per esempio, se le prime due voci sono una bozza e una guida pubblicata, la prima card pubblica sarà la guida in seconda posizione dell'elenco completo.
