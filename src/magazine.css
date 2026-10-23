@@ -4,13 +4,51 @@
   .hero__content { width: min(1180px, calc(100% - 48px)); }
   .hero__brand-panel {
     justify-content: flex-end;
-    /* Push the logo noticeably farther right on desktop; keep its visible edge
-       within the viewport from compact laptops to wide displays. */
-    transform: translateX(clamp(40px, calc(50vw - 594px), 130px));
+    /* Position the brand further to the right without affecting the copy. */
+    transform: translateX(clamp(70px, calc(50vw - 545px), 200px));
   }
+}
+@media (min-width: 901px) and (max-width: 1100px) {
+  .hero__brand-panel { transform: translateX(45px); }
 }
 @media (max-width: 900px) { .hero__brand-panel { transform: none; } }
 @media (max-width: 480px) { .hero__content { width: calc(100% - 32px); } }
+
+/* Hero CTAs are stacked and share the same width. The second action stays
+   transparent, with a green outlined treatment that reads over photographs. */
+.hero__actions {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  width: fit-content;
+  max-width: 100%;
+  gap: 14px;
+  margin-top: 26px;
+}
+.hero__actions .MuiButton-root {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
+.hero__actions .hero__secondary-cta.MuiButton-outlined {
+  border: 2px solid #62e17c;
+  background-color: transparent;
+  color: #a3f3af;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  box-shadow: none;
+}
+.hero__actions .hero__secondary-cta.MuiButton-outlined:hover,
+.hero__actions .hero__secondary-cta.MuiButton-outlined:focus-visible {
+  border-color: #b0f9bb;
+  background-color: transparent;
+  color: #d5ffdc;
+}
+@media (max-width: 480px) {
+  .hero__actions { width: 100%; gap: 12px; }
+}
 
 .seller-focus {
   padding: clamp(64px, 7vw, 105px) 0;
