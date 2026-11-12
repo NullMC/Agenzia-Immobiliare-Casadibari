@@ -44,6 +44,8 @@ type PropertyForm = {
   city: string;
   neighborhood: string;
   address: string;
+  map_latitude: string;
+  map_longitude: string;
   area_sqm: string;
   rooms: string;
   bedrooms: string;
@@ -103,6 +105,8 @@ const blankProperty: PropertyForm = {
   city: 'Bari',
   neighborhood: '',
   address: '',
+  map_latitude: '',
+  map_longitude: '',
   area_sqm: '',
   rooms: '',
   bedrooms: '',
@@ -198,7 +202,21 @@ export default function AdminPage() {
   // One ordered list for both uploaded and not-yet-uploaded photographs.
   const [photoEntries, setPhotoEntries] = useState<PhotoEntry[]>([]);
   const photoPreviews = useRef<Set<string>>(new Set());
+  const [floorPlanFile, setFloorPlanFile] = useState<File | null>(null);
+  const [floorPlanPreview, setFloorPlanPreview] = useState('');
+  const [removeFloorPlan, setRemoveFloorPlan] = useState(false);
+  const [geolocating, setGeolocating] = useState(false);
   const [propertySaving, setPropertySaving] = useState(false);
+
+  useEffect(() => {
+    if (!floorPlanFile) {
+      setFloorPlanPreview('');
+      return;
+    }
+    const objectUrl = URL.createObjectURL(floorPlanFile);
+    setFloorPlanPreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [floorPlanFile]);
 
   useEffect(() => {
     const previews = photoPreviews.current;
@@ -369,6 +387,8 @@ export default function AdminPage() {
     setEditingId(null);
     setPropertyForm({ ...blankProperty });
     setPhotoEntries([]);
+    setFloorPlanFile(null);
+    setRemoveFloorPlan(false);
     setNotice('');
   };
 
@@ -413,6 +433,8 @@ export default function AdminPage() {
       city: property.city || 'Bari',
       neighborhood: property.neighborhood || '',
       address: property.address || '',
+      map_latitude: property.map_latitude == null ? '' : String(property.map_latitude),
+      map_longitude: property.map_longitude == null ? '' : String(property.map_longitude),
       area_sqm: property.area_sqm == null ? '' : String(property.area_sqm),
       rooms: property.rooms == null ? '' : String(property.rooms),
       bedrooms: property.bedrooms == null ? '' : String(property.bedrooms),
@@ -424,6 +446,8 @@ export default function AdminPage() {
       published: Boolean(property.published),
     });
     clearPhotoPreviews();
+    setFloorPlanFile(null);
+    setRemoveFloorPlan(false);
     setPhotoEntries(
       sortPropertyPhotos(property.property_images || []).map((image) => ({
         kind: 'existing' as const,
@@ -440,6 +464,20 @@ export default function AdminPage() {
     setNotice('');
     if (!propertyForm.title.trim()) {
       setNotice('Inserisci il titolo dell’annuncio.');
+      return;
+    }
+    const latitude = propertyForm.map_latitude.trim();
+    const longitude = propertyForm.map_longitude.trim();
+    if (
+      (Boolean(latitude) !== Boolean(longitude)) ||
+      (latitude && (
+        !Number.isFinite(Number(latitude)) ||
+        !Number.isFinite(Number(longitude)) ||
+        Number(latitude) < -90 || Number(latitude) > 90 ||
+        Number(longitude) < -180 || Number(longitude) > 180
+      ))
+    ) {
+      setNotice('Inserisci entrambe le coordinate valide (latitudine e longitudine), oppure lasciale vuote per il posizionamento automatico.');
       return;
     }
     setPropertySaving(true);
@@ -459,6 +497,16 @@ export default function AdminPage() {
       city: propertyForm.city.trim() || 'Bari',
       neighborhood: propertyForm.neighborhood.trim(),
       address: propertyForm.address.trim(),
+      map_latitude: latitude ? Number(latitude) : null,
+      map_longitude: longitude ? Number(longitude) : null,
+      map_geocoded_address: latitude
+        ? [
+            propertyForm.address.trim(),
+            propertyForm.neighborhood.trim(),
+            propertyForm.city.trim() || 'Bari',
+            'Italia',
+          ].filter(Boolean).join(', ')
+        : null,
       area_sqm: propertyForm.area_sqm ? Number(propertyForm.area_sqm) : null,
       rooms: propertyForm.rooms ? Number(propertyForm.rooms) : null,
       bedrooms: propertyForm.bedrooms ? Number(propertyForm.bedrooms) : null,
@@ -585,21 +633,107 @@ export default function AdminPage() {
       };
     }
 
-    await loadData();
-    setPropertySaving(false);
+    // Floor plan is deliberately separate from the normal gallery.
+    const oldPlan = properties.find((item) => item.id === propertyId);
+    if (!writeError && floorPlanFile) {
+      const path =
+        propertyId + '/floorplans/' + crypto.randomUUID() + '-' +
+        floorPlanFile.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+      const { error: uploadError } = await supabase.storage
+        .from('property-images')
+        .upload(path, floorPlanFile, {
+          upsert: false,
+          contentType: floorPlanFile.type,
+        });
+      if (uploadError) {
+        writeError = 'Immobile salvato ma caricamento planimetria fallito: ' + uploadError.message;
+      } else {
+        const url = supabase.storage.from('property-images').getPublicUrl(path).data.publicUrl;
+        const { error } = await supabase.from('properties')
+          .update({ floor_plan_url: url, floor_plan_storage_path: path })
+          .eq('id', propertyId);
+        if (error) {
+          await supabase.storage.from('property-images').remove([path]);
+          writeError = 'Planimetria non associata all’immobile: ' + error.message;
+        } else {
+          if (oldPlan?.floor_plan_storage_path) {
+            await supabase.storage.from('property-images')
+              .remove([oldPlan.floor_plan_storage_path]);
+          }
+          setFloorPlanFile(null);
+        }
+      }
+    } else if (!writeError && removeFloorPlan && oldPlan?.floor_plan_url) {
+      const { error } = await supabase.from('properties')
+        .update({ floor_plan_url: null, floor_plan_storage_path: null })
+        .eq('id', propertyId);
+      if (error) {
+        writeError = 'Rimozione planimetria fallita: ' + error.message;
+      } else if (oldPlan.floor_plan_storage_path) {
+        await supabase.storage.from('property-images')
+          .remove([oldPlan.floor_plan_storage_path]);
+      }
+    }
+
     if (writeError) {
+      await loadData();
+      setPropertySaving(false);
       setPhotoEntries(persistedEntries);
       setEditingId(propertyId);
       setNotice(writeError + ' Le modifiche già salvate restano disponibili: correggi e riprova.');
       return;
     }
 
+    let geoNotice = '';
+    if (!latitude && propertyForm.address.trim()) {
+      // Geocode at write time only. Public site visitors never call the provider.
+      const { data, error } = await supabase.functions.invoke('geocode-property', {
+        body: { property_id: propertyId },
+      });
+      if (error || data?.error) {
+        geoNotice = ' Indirizzo non geolocalizzato: ' +
+          (data?.error || 'controlla la Edge Function geocode-property e le coordinate.');
+      }
+    } else if (!latitude && !propertyForm.address.trim()) {
+      geoNotice = ' Aggiungi un indirizzo per visualizzare l’immobile sulla mappa.';
+    }
+
+    await loadData();
+    setPropertySaving(false);
     startNewProperty();
     setNotice(
-      propertyForm.published
-        ? 'Annuncio pubblicato. Ordine delle foto e copertina aggiornati.'
-        : 'Bozza salvata. Ordine delle foto aggiornato.',
+      (propertyForm.published ? 'Annuncio pubblicato.' : 'Bozza salvata.') +
+      ' Fotografie e planimetria aggiornate.' + geoNotice,
     );
+  };
+
+  const geolocateMissingProperties = async () => {
+    const pending = properties.filter((property) =>
+      Boolean(property.address?.trim()) &&
+      (property.map_latitude == null || property.map_longitude == null)
+    );
+    if (!pending.length) {
+      setNotice('Tutti gli immobili con indirizzo risultano già geolocalizzati.');
+      return;
+    }
+    if (!window.confirm('Geolocalizzare ' + pending.length + ' immobili senza coordinate? L’operazione aggiorna solamente la loro posizione sulla mappa.'))
+      return;
+    setGeolocating(true);
+    let success = 0;
+    let failed = 0;
+    for (const property of pending) {
+      const { data, error } = await supabase.functions.invoke('geocode-property', {
+        body: { property_id: property.id },
+      });
+      if (error || data?.error) failed += 1;
+      else success += 1;
+      // Public Photon API requires reasonable usage; prevent rapid batch requests.
+      await new Promise((resolve) => setTimeout(resolve, 1400));
+    }
+    await loadData();
+    setGeolocating(false);
+    setNotice('Geolocalizzazione: ' + success + ' immobili aggiornati, ' + failed +
+      ' da verificare. Per gli indirizzi non trovati imposta le coordinate manualmente.');
   };
 
   const deleteProperty = async (property: Property) => {
@@ -608,6 +742,7 @@ export default function AdminPage() {
     const paths = images
       .map((image) => image.storage_path)
       .filter((path): path is string => Boolean(path));
+    if (property.floor_plan_storage_path) paths.push(property.floor_plan_storage_path);
     if (paths.length) await supabase.storage.from('property-images').remove(paths);
     const { error } = await supabase.from('properties').delete().eq('id', property.id);
     setNotice(error ? 'Eliminazione non riuscita: ' + error.message : 'Annuncio eliminato.');
