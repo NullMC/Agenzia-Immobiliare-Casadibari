@@ -67,7 +67,8 @@ Deno.serve(async (request: Request) => {
 
   const { data: property, error: propertyError } = await db
     .from('properties')
-    .select('id,address,city,neighborhood,map_latitude,map_longitude,map_geocoded_address')
+    // '*' keeps working before and after the street_number migration.
+    .select('*')
     .eq('id', propertyId)
     .maybeSingle();
   if (propertyError || !property) return json({ error: 'Immobile non trovato' }, 404);
@@ -76,7 +77,8 @@ Deno.serve(async (request: Request) => {
   }
 
   const listing = {
-    address: property.address,
+    // Street and house number are stored in separate columns.
+    address: [property.address?.trim(), property.street_number?.trim()].filter(Boolean).join(' '),
     neighborhood: property.neighborhood,
     city: property.city?.trim() || 'Bari',
   };

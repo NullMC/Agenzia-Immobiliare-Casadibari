@@ -145,6 +145,11 @@
 }
 
 /* Admin controls for optional floor plan and geocoding. */
+/* Street takes two columns, house number one: they fill a full row on desktop. */
+.admin-form-grid .field--street { grid-column: span 2; }
+@media (max-width: 620px) {
+  .admin-form-grid .field--street { grid-column: auto; }
+}
 .admin-map-guidance {
   border: 1px solid #daecdd;
   background: #f5faf6;

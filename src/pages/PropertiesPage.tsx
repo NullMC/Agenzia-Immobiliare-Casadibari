@@ -6,6 +6,7 @@ import Seo from '../components/Seo';
 import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
 import PropertyMap from '../components/PropertyMap';
+import { formatStreetAddress } from '../lib/address';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { type Property, type SearchFilters } from '../types';
 
@@ -65,7 +66,7 @@ export default function PropertiesPage() {
             !search ||
             [
               property.title,
-              property.address,
+              formatStreetAddress(property),
               property.city,
               property.neighborhood,
               property.subtitle,

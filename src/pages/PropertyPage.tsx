@@ -20,6 +20,7 @@ import DOMPurify from 'dompurify';
 import { IconButton } from '@mui/material';
 import PropertyCard from '../components/PropertyCard';
 import '../property-detail-extras.css';
+import { formatStreetAddress } from '../lib/address';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { type Property } from '../types';
 
@@ -156,7 +157,7 @@ export default function PropertyPage() {
             </span>
             <h1>{property.title}</h1>
             <p>
-              <MapPin size={17} /> {property.address || property.neighborhood || property.city}
+              <MapPin size={17} /> {formatStreetAddress(property) || property.neighborhood || property.city}
               {property.city ? ', ' + property.city : ''}
             </p>
           </div>

@@ -30,6 +30,7 @@ import Seo from '../components/Seo';
 import RichTextEditor from '../components/RichTextEditor';
 import '../property-media.css';
 import AdminArticles from '../components/AdminArticles';
+import { formatStreetAddress, splitStreetAddress } from '../lib/address';
 import { supabase } from '../lib/supabase';
 import type { ContactSettings, Faq, Property, PropertyImage, TeamMember } from '../types';
 
@@ -45,6 +46,7 @@ type PropertyForm = {
   city: string;
   neighborhood: string;
   address: string;
+  street_number: string;
   map_latitude: string;
   map_longitude: string;
   area_sqm: string;
@@ -106,6 +108,7 @@ const blankProperty: PropertyForm = {
   city: 'Bari',
   neighborhood: '',
   address: '',
+  street_number: '',
   map_latitude: '',
   map_longitude: '',
   area_sqm: '',
@@ -471,7 +474,12 @@ export default function AdminPage() {
       price: property.price == null ? '' : String(property.price),
       city: property.city || 'Bari',
       neighborhood: property.neighborhood || '',
-      address: property.address || '',
+      // Older listings may still hold "Via X 12" in one field: split it for editing.
+      ...(property.street_number
+        ? { address: property.address || '', street_number: property.street_number }
+        : (({ street, number }) => ({ address: street, street_number: number }))(
+            splitStreetAddress(property.address || ''),
+          )),
       map_latitude: property.map_latitude == null ? '' : String(property.map_latitude),
       map_longitude: property.map_longitude == null ? '' : String(property.map_longitude),
       area_sqm: property.area_sqm == null ? '' : String(property.area_sqm),
@@ -536,11 +544,12 @@ export default function AdminPage() {
       city: propertyForm.city.trim() || 'Bari',
       neighborhood: propertyForm.neighborhood.trim(),
       address: propertyForm.address.trim(),
+      street_number: propertyForm.street_number.trim().toUpperCase(),
       map_latitude: latitude ? Number(latitude) : null,
       map_longitude: longitude ? Number(longitude) : null,
       map_geocoded_address: latitude
         ? [
-            propertyForm.address.trim(),
+            formatStreetAddress(propertyForm),
             propertyForm.neighborhood.trim(),
             propertyForm.city.trim() || 'Bari',
             'Italia',
@@ -1239,8 +1248,8 @@ export default function AdminPage() {
                       }
                     />
                   </label>
-                  <label className="field field--wide">
-                    <span>Indirizzo</span>
+                  <label className="field field--street">
+                    <span>Via / piazza</span>
                     <input
                       value={propertyForm.address}
                       onChange={(e) =>
@@ -1251,7 +1260,25 @@ export default function AdminPage() {
                           map_longitude: '',
                         }))
                       }
-                      placeholder="Es. Via Pasubio 78A"
+                      placeholder="Es. Via Pasubio"
+                      autoComplete="off"
+                    />
+                  </label>
+                  <label className="field">
+                    <span>Numero civico</span>
+                    <input
+                      value={propertyForm.street_number}
+                      onChange={(e) =>
+                        setPropertyForm((current) => ({
+                          ...current,
+                          street_number: e.target.value,
+                          map_latitude: '',
+                          map_longitude: '',
+                        }))
+                      }
+                      placeholder="Es. 78A"
+                      maxLength={12}
+                      autoComplete="off"
                     />
                   </label>
                   <div className="field field--wide admin-map-guidance">

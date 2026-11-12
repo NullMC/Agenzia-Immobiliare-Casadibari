@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ExternalLink, MapPin, Navigation, Eye } from 'lucide-react';
+import { formatStreetAddress } from '../lib/address';
 import type { Property } from '../types';
 import './property-map.css';
 
@@ -185,7 +186,7 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
                 </button>
                 <div>
                   <strong>{streetViewProperty.title}</strong>
-                  <span>{streetViewProperty.address}, {streetViewProperty.city}</span>
+                  <span>{[formatStreetAddress(streetViewProperty), streetViewProperty.city].filter(Boolean).join(', ')}</span>
                 </div>
                 <Link to={'/immobile/' + streetViewProperty.slug}>Apri annuncio <ArrowRight size={15} /></Link>
               </div>

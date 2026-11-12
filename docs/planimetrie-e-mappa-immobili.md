@@ -15,6 +15,10 @@
 - **Street View è una panoramica navigabile a 360°, non il modello 3D garantito del singolo edificio.** La disponibilità e la data delle immagini dipendono da Google.
 - Sono mostrati solo annunci pubblicati che hanno coordinate valide. La mappa segue i filtri già scelti dal visitatore.
 
+### Indirizzo
+- Nell'editor l'indirizzo è diviso in **Via / piazza** (`properties.address`) e **Numero civico** (`properties.street_number`, es. `78A`, `3/B`). Il sito e la geolocalizzazione li uniscono automaticamente.
+- Migrazione: `supabase/migrations/202611120002_property_street_number.sql` (aggiunge la colonna e sposta il civico finale degli indirizzi esistenti). Gli annunci non ancora migrati vengono separati automaticamente quando si aprono in modifica.
+
 ### Coordinate
 - Il salvataggio di un annuncio con indirizzo e coordinate vuote richiama la Edge Function **geocode-property**. Solo gli amministratori autenticati e abilitati possono richiamarla.
 - La funzione cerca l'indirizzo con Photon/OSM e, se Photon non risponde o non trova una corrispondenza, con **Nominatim/OSM** come riserva; salva poi le coordinate. Il punto è accettato solo se **via e comune** coincidono (il comune può essere indicato anche nel campo Zona, es. "Conversano"); se non c'è una corrispondenza affidabile, il backoffice segnala che occorre indicare manualmente latitudine e longitudine.

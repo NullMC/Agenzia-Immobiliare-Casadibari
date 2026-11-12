@@ -37,6 +37,7 @@ export interface Property {
   city: string;
   neighborhood: string;
   address: string;
+  street_number?: string | null;
   area_sqm: number | null;
   rooms: number | null;
   bedrooms: number | null;
