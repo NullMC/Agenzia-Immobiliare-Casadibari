@@ -261,7 +261,8 @@
 }
 .listing-streetview__fallback h3 { margin: 0; font-size: 24px; }
 .listing-streetview__fallback p { margin: 0; max-width: 520px; font-size: 13px; color: #56675a; }
-.listing-streetview__fallback a {
+.listing-streetview__fallback a,
+.listing-streetview__fallback .listing-streetview__activate {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -271,6 +272,10 @@
   color: #fff;
   font-weight: 700;
   font-size: 13px;
+}
+.listing-streetview__activate {
+  border: 0;
+  cursor: pointer;
 }
 .listing-streetview__external {
   padding: 12px;
