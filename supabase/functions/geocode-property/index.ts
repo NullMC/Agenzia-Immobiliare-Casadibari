@@ -137,7 +137,13 @@ Deno.serve(async (request: Request) => {
     const payload = await response.json() as { features?: Feature[] };
     const candidates = payload.features || [];
     const city = normalize(property.city || 'Bari');
-    const street = normalize(property.address || '').replace(/\b(via|viale|corso|piazza|largo|strada|numero|civico)\b/g, '').trim();
+    const cleanStreet = (value: string) => normalize(value)
+      .replace(/\b(via|viale|corso|piazza|largo|strada|numero|civico)\b/g, '')
+      .replace(/[0-9].*$/, '')
+      .replace(/[^a-z\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const street = cleanStreet(String(property.address || '').split(',')[0]);
     const scored = candidates
       .map((feature) => {
         const coordinates = feature.geometry?.coordinates;
@@ -145,7 +151,7 @@ Deno.serve(async (request: Request) => {
         const latitude = Number(coordinates?.[1]);
         const props = feature.properties || {};
         const location = normalize([props.city, props.county].filter(Boolean).join(' '));
-        const line = normalize([props.street, props.name].filter(Boolean).join(' '));
+        const line = cleanStreet(props.street || props.name || '');
         const country = normalize(props.country || '');
         const score =
           (location.includes(city) ? 4 : 0) +
@@ -163,7 +169,8 @@ Deno.serve(async (request: Request) => {
       )
       .sort((a, b) => b.score - a.score);
     const first = scored[0];
-    if (!first || first.score < 4) {
+    // Never accept a match on city alone: a wrong pin would mislead customers.
+    if (!first || first.score < 7) {
       return json({
         error: 'Indirizzo non localizzato con sufficiente precisione. Imposta le coordinate manualmente nel backoffice.',
       }, 422);
