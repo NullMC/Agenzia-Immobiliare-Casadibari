@@ -12,11 +12,14 @@ import {
   MapPin,
   Maximize2,
   Phone,
+  FileImage,
+  X,
 } from 'lucide-react';
 import Seo from '../components/Seo';
 import DOMPurify from 'dompurify';
 import { IconButton } from '@mui/material';
 import PropertyCard from '../components/PropertyCard';
+import '../property-detail-extras.css';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { type Property } from '../types';
 
@@ -32,9 +35,11 @@ export default function PropertyPage() {
   const [related, setRelated] = useState<Property[]>([]);
   const [loading, setLoading] = useState(isSupabaseConfigured);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [floorPlanOpen, setFloorPlanOpen] = useState(false);
 
   useEffect(() => {
     setPhotoIndex(0);
+    setFloorPlanOpen(false);
     if (!isSupabaseConfigured) {
       setProperty(null);
       setLoading(false);
@@ -218,8 +223,27 @@ export default function PropertyPage() {
             </div>
           )}
         </div>
-        <div className="property-detail__layout">
-          <article className="property-description">
+        <div className={'property-detail__overview' + (property.floor_plan_url ? ' has-floor-plan' : '')}>
+          {property.floor_plan_url && (
+            <section className="property-floorplan" aria-label="Planimetria dell'immobile">
+              <div className="property-overview__heading">
+                <FileImage size={20} /> <h2>Planimetria</h2>
+              </div>
+              <button
+                type="button"
+                className="property-floorplan__button"
+                onClick={() => setFloorPlanOpen(true)}
+                aria-label="Apri la planimetria ingrandita"
+              >
+                <img src={property.floor_plan_url} alt={'Planimetria: ' + property.title} loading="lazy" />
+                <span>Visualizza a schermo intero <ArrowRight size={15} /></span>
+              </button>
+            </section>
+          )}
+          <section className="property-overview__specifications" aria-label="Specifiche dell'immobile">
+            <div className="property-overview__heading">
+              <Maximize2 size={20} /> <h2>Specifiche dell'immobile</h2>
+            </div>
             <div className="property-facts">
               {property.area_sqm != null && (
                 <div>
@@ -258,6 +282,26 @@ export default function PropertyPage() {
                 </div>
               )}
             </div>
+          </section>
+        </div>
+        {floorPlanOpen && property.floor_plan_url && (
+          <div
+            className="property-floorplan-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Planimetria ingrandita"
+            onClick={() => setFloorPlanOpen(false)}
+          >
+            <div className="property-floorplan-modal__inner" onClick={(e) => e.stopPropagation()}>
+              <button type="button" onClick={() => setFloorPlanOpen(false)} aria-label="Chiudi planimetria">
+                <X size={22} /> Chiudi
+              </button>
+              <img src={property.floor_plan_url} alt={'Planimetria: ' + property.title} />
+            </div>
+          </div>
+        )}
+        <div className="property-detail__layout">
+          <article className="property-description">
             <h2>Descrizione dell’immobile</h2>
             <div
               className="rich-description"
