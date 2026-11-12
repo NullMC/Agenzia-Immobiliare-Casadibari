@@ -72,6 +72,7 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
   );
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [streetViewProperty, setStreetViewProperty] = useState<Property | null>(null);
+  const [allowGoogleEmbed, setAllowGoogleEmbed] = useState(false);
   const [mapUnavailable, setMapUnavailable] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -116,6 +117,7 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
         marker.on('focus', () => setHoveredId(property.id));
         marker.on('click', () => {
           setHoveredId(null);
+          setAllowGoogleEmbed(false);
           setStreetViewProperty(property);
         });
         markers.push(marker);
@@ -163,7 +165,7 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
           {streetViewProperty ? (
             <div className="listing-streetview">
               <div className="listing-streetview__topbar">
-                <button type="button" className="listing-streetview__back" onClick={() => setStreetViewProperty(null)}>
+                <button type="button" className="listing-streetview__back" onClick={() => { setStreetViewProperty(null); setAllowGoogleEmbed(false); }}>
                   <ArrowLeft size={18} /> Torna alla mappa
                 </button>
                 <div>
@@ -172,7 +174,7 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
                 </div>
                 <Link to={'/immobile/' + streetViewProperty.slug}>Apri annuncio <ArrowRight size={15} /></Link>
               </div>
-              {STREET_VIEW_KEY ? (
+              {STREET_VIEW_KEY && allowGoogleEmbed ? (
                 <iframe
                   className="listing-streetview__iframe"
                   src={
@@ -191,13 +193,23 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
                   <Eye size={48} />
                   <h3>Esplora gli esterni con Street View</h3>
                   <p>
-                    La visualizzazione panoramica integrata richiede
-                    l’attivazione di Google Maps Embed API da parte dell’agenzia.
-                    Nel frattempo puoi aprire la zona direttamente in Google Maps.
+                    {STREET_VIEW_KEY
+                      ? 'Per caricare la panoramica di Google Maps, conferma l’apertura del contenuto esterno. Google potrebbe trattare dati di navigazione e impostare cookie secondo la propria informativa.'
+                      : 'La visualizzazione panoramica integrata richiede l’attivazione di Google Maps Embed API da parte dell’agenzia. Nel frattempo puoi aprire la zona in Google Maps.'}
                   </p>
-                  <a href={streetViewUrl(streetViewProperty)} target="_blank" rel="noopener noreferrer">
-                    Apri Street View in Google Maps <ExternalLink size={17} />
-                  </a>
+                  {STREET_VIEW_KEY ? (
+                    <button
+                      type="button"
+                      className="listing-streetview__activate"
+                      onClick={() => setAllowGoogleEmbed(true)}
+                    >
+                      Carica la vista panoramica Google <ArrowRight size={17} />
+                    </button>
+                  ) : (
+                    <a href={streetViewUrl(streetViewProperty)} target="_blank" rel="noopener noreferrer">
+                      Apri Street View in Google Maps <ExternalLink size={17} />
+                    </a>
+                  )}
                 </div>
               )}
               {STREET_VIEW_KEY && (
@@ -230,7 +242,7 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
                   <button
                     type="button"
                     className="listing-map-overlay__street"
-                    onClick={() => { setStreetViewProperty(hovered); setHoveredId(null); }}
+                    onClick={() => { setStreetViewProperty(hovered); setHoveredId(null); setAllowGoogleEmbed(false); }}
                   >
                     <Eye size={16} /> Esplora la strada
                   </button>
