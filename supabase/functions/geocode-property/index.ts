@@ -131,9 +131,17 @@ Deno.serve(async (request: Request) => {
         Accept: 'application/json',
         'User-Agent': 'CasadibariImmobiliare/1.0 (+https://casadibari.com; info@casadibari.it)',
       },
-      signal: AbortSignal.timeout(8500),
+      // Allow slow responses from the public demo geocoder; report timeouts explicitly.
+      signal: AbortSignal.timeout(15000),
     });
-    if (!response.ok) return json({ error: 'Servizio di geolocalizzazione non disponibile' }, 503);
+    if (!response.ok) {
+      console.warn('Photon geocoding returned HTTP', response.status);
+      return json({
+        error: response.status === 429
+          ? 'Servizio di geolocalizzazione temporaneamente limitato per troppe richieste (HTTP 429). Riprova più tardi.'
+          : 'Servizio di geolocalizzazione non disponibile (Photon HTTP ' + response.status + ').',
+      }, 503);
+    }
     const payload = await response.json() as { features?: Feature[] };
     const candidates = payload.features || [];
     const city = normalize(property.city || 'Bari');
@@ -192,6 +200,13 @@ Deno.serve(async (request: Request) => {
       note: 'Verifica il punto sulla mappa, soprattutto per indirizzi senza numero civico.',
     });
   } catch (error) {
+    if (error instanceof Error && error.name === 'TimeoutError') {
+      console.warn('Photon geocoding timed out after 15000ms');
+      return json({
+        error: 'Il servizio di geolocalizzazione non ha risposto entro 15 secondi. Riprova più tardi o inserisci le coordinate manualmente.',
+      }, 503);
+    }
+    console.error('geocode-property failed:', error);
     return json({
       error: error instanceof Error ? 'Geolocalizzazione fallita: ' + error.message : 'Geolocalizzazione fallita',
     }, 503);
