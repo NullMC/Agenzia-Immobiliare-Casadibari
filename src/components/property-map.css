@@ -54,6 +54,8 @@
   width: 100%;
   height: 100%;
   z-index: 0;
+  /* Keep touch gestures inside Leaflet instead of zooming the browser page. */
+  touch-action: none;
 }
 .listing-map-marker-container {
   border: 0;
