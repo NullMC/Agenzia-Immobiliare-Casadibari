@@ -49,6 +49,11 @@ export interface Property {
   created_at?: string;
   updated_at?: string;
   property_images?: PropertyImage[];
+  floor_plan_url?: string | null;
+  floor_plan_storage_path?: string | null;
+  map_latitude?: number | null;
+  map_longitude?: number | null;
+  map_geocoded_address?: string | null;
 }
 
 export interface SearchFilters {
