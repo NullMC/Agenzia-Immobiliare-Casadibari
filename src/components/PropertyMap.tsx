@@ -87,7 +87,8 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
     let map: any;
     try {
       map = leaflet.map(containerRef.current, {
-        scrollWheelZoom: false,
+        scrollWheelZoom: true,
+        touchZoom: true,
         zoomControl: true,
         tap: true,
       }).setView(DEFAULT_CENTER, 12);
