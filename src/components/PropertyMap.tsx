@@ -102,13 +102,27 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
           '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors',
       }).addTo(map);
 
+      // Listings on the same point (e.g. several units in one building) would hide
+      // each other: fan their icons out horizontally in pixels, keeping the real position.
+      const samePoint = new Map<string, number>();
+      const pointCount = new Map<string, number>();
+      const pointKey = (property: Property) =>
+        property.map_latitude!.toFixed(5) + ',' + property.map_longitude!.toFixed(5);
+      for (const property of mappedProperties) {
+        pointCount.set(pointKey(property), (pointCount.get(pointKey(property)) || 0) + 1);
+      }
+
       const markers: any[] = [];
       for (const property of mappedProperties) {
+        const key = pointKey(property);
+        const index = samePoint.get(key) || 0;
+        samePoint.set(key, index + 1);
+        const shift = (index - ((pointCount.get(key) || 1) - 1) / 2) * 34;
         const icon = leaflet.divIcon({
           className: 'listing-map-marker-container',
           html: '<span class="listing-map-marker"><img src="/Casa.webp" alt="" /></span>',
           iconSize: [46, 59],
-          iconAnchor: [23, 52],
+          iconAnchor: [23 - shift, 52],
         });
         const marker = leaflet.marker(
           [property.map_latitude!, property.map_longitude!],

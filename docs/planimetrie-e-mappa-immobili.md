@@ -17,7 +17,9 @@
 
 ### Coordinate
 - Il salvataggio di un annuncio con indirizzo e coordinate vuote richiama la Edge Function **geocode-property**. Solo gli amministratori autenticati e abilitati possono richiamarla.
-- La funzione cerca l'indirizzo con Photon/OSM e salva le coordinate; se non trova una corrispondenza affidabile, il backoffice segnala che occorre indicare manualmente latitudine e longitudine.
+- La funzione cerca l'indirizzo con Photon/OSM e, se Photon non risponde o non trova una corrispondenza, con **Nominatim/OSM** come riserva; salva poi le coordinate. Il punto è accettato solo se **via e comune** coincidono (il comune può essere indicato anche nel campo Zona, es. "Conversano"); se non c'è una corrispondenza affidabile, il backoffice segnala che occorre indicare manualmente latitudine e longitudine.
+- **Nota tecnica:** Photon accetta solo `lang=default|de|en|fr`; con `lang=it` risponde HTTP 400 (era la causa dell'errore "Indirizzo non geolocalizzato"). Test della logica: `node supabase/functions/geocode-property/geocoding.test.ts --live`.
+- Più annunci con le stesse coordinate (es. unità nello stesso stabile) vengono affiancati sulla mappa, così ciascuno resta selezionabile.
 - Nell'editor si possono impostare o correggere le coordinate manualmente. **Controllare sempre il punto** se l'indirizzo non è preciso.
 - Il pulsante **Localizza indirizzi mancanti** sotto l'elenco annunci permette di tentare la geocodifica anche per gli immobili pubblicati prima di questa implementazione, in ordine e con pause fra le richieste.
 
@@ -54,6 +56,6 @@ Se la chiave non è stata impostata, **la mappa OSM continua a funzionare**, ma 
 ## Map tiles e geocodifica
 
 - Leaflet 1.9.4 è caricato da CDN con SRI; il livello predefinito usa `https://tile.openstreetmap.org/{z}/{x}/{y}.png` e attribuzione © OpenStreetMap contributors. Rispetta la [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/). I server comunitari non garantiscono un servizio commerciale continuo: per traffico crescente configura un provider con SLA usando `VITE_MAP_TILE_URL` e `VITE_MAP_TILE_ATTRIBUTION`.
-- Photon (`photon.komoot.io`) è un'istanza dimostrativa con uso ragionevole. L'integrazione limita le richieste agli amministratori durante salvataggi/backfill e ne salva l'esito; per utilizzo estensivo sostituisci il provider con uno autorizzato o un'istanza propria.
+- Photon (`photon.komoot.io`) e Nominatim (`nominatim.openstreetmap.org`, max 1 richiesta/secondo) sono servizi pubblici a uso ragionevole. L'integrazione limita le richieste agli amministratori durante salvataggi/backfill e ne salva l'esito; per utilizzo estensivo sostituisci il provider con uno autorizzato o un'istanza propria.
 - Non sono mai eseguite ricerche automatiche degli indirizzi dai browser pubblici.
 - **Privacy e autorizzazioni:** verifica che le planimetrie siano autorizzate alla pubblicazione e che l'immobile possa essere mostrato all'indirizzo preciso. Aggiorna l'informativa privacy e la lista dei servizi terzi per OpenStreetMap, Photon e Google Maps, e gestisci l'eventuale consenso ai contenuti esterni.

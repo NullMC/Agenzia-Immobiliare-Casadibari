@@ -1,17 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-type Feature = {
-  geometry?: { coordinates?: number[] };
-  properties?: {
-    name?: string;
-    street?: string;
-    housenumber?: string;
-    city?: string;
-    county?: string;
-    state?: string;
-    country?: string;
-  };
-};
+import { composeAddress, geocodeListing } from './geocoding.ts';
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -34,14 +22,6 @@ function serviceKey(): string | undefined {
   } catch {
     return undefined;
   }
-}
-
-function normalize(value: string) {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim()
-    .toLocaleLowerCase('it-IT');
 }
 
 // This endpoint geocodes only listings owned by an authenticated agency admin.
@@ -95,12 +75,12 @@ Deno.serve(async (request: Request) => {
     return json({ error: 'Inserisci l’indirizzo completo per localizzare l’immobile' }, 422);
   }
 
-  const address = [
-    property.address.trim(),
-    property.neighborhood?.trim(),
-    property.city?.trim() || 'Bari',
-    'Italia',
-  ].filter(Boolean).join(', ');
+  const listing = {
+    address: property.address,
+    neighborhood: property.neighborhood,
+    city: property.city?.trim() || 'Bari',
+  };
+  const address = composeAddress(listing);
 
   // Reuse cached coordinates when the address has not changed.
   if (
@@ -116,99 +96,38 @@ Deno.serve(async (request: Request) => {
     });
   }
 
-  // Photon is an open-source OSM-based geocoder. Use only during an admin save,
-  // cache results in DB, never call it on every public page view.
-  const url = new URL('https://photon.komoot.io/api/');
-  url.searchParams.set('q', address);
-  url.searchParams.set('limit', '5');
-  url.searchParams.set('lang', 'it');
-  url.searchParams.set('lat', '41.1171');
-  url.searchParams.set('lon', '16.8719');
-
+  // OpenStreetMap geocoders (Photon, then Nominatim) are called only during an
+  // admin save/backfill and the result is cached in DB, never on public page views.
   try {
-    const response = await fetch(url, {
-      headers: {
-        Accept: 'application/json',
-        'User-Agent': 'CasadibariImmobiliare/1.0 (+https://casadibari.com; info@casadibari.it)',
-      },
-      // Allow slow responses from the public demo geocoder; report timeouts explicitly.
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!response.ok) {
-      console.warn('Photon geocoding returned HTTP', response.status);
-      return json({
-        error: response.status === 429
-          ? 'Servizio di geolocalizzazione temporaneamente limitato per troppe richieste (HTTP 429). Riprova più tardi.'
-          : 'Servizio di geolocalizzazione non disponibile (Photon HTTP ' + response.status + ').',
-      }, 503);
+    const outcome = await geocodeListing(listing);
+    if (!outcome.ok) {
+      console.warn('geocode-property: no match for', address, '-', outcome.message);
+      return json({ error: outcome.message }, outcome.unavailable ? 503 : 422);
     }
-    const payload = await response.json() as { features?: Feature[] };
-    const candidates = payload.features || [];
-    const city = normalize(property.city || 'Bari');
-    const cleanStreet = (value: string) => normalize(value)
-      .replace(/\b(via|viale|corso|piazza|largo|strada|numero|civico)\b/g, '')
-      .replace(/[0-9].*$/, '')
-      .replace(/[^a-z\s]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-    const street = cleanStreet(String(property.address || '').split(',')[0]);
-    const scored = candidates
-      .map((feature) => {
-        const coordinates = feature.geometry?.coordinates;
-        const longitude = Number(coordinates?.[0]);
-        const latitude = Number(coordinates?.[1]);
-        const props = feature.properties || {};
-        const location = normalize([props.city, props.county].filter(Boolean).join(' '));
-        const line = cleanStreet(props.street || props.name || '');
-        const country = normalize(props.country || '');
-        const score =
-          (location.includes(city) ? 4 : 0) +
-          (street && line && (line.includes(street) || street.includes(line)) ? 3 : 0) +
-          (country.includes('ital') ? 1 : 0);
-        return { latitude, longitude, score };
-      })
-      .filter((item) =>
-        Number.isFinite(item.latitude) &&
-        Number.isFinite(item.longitude) &&
-        item.latitude >= 35 &&
-        item.latitude <= 48 &&
-        item.longitude >= 6 &&
-        item.longitude <= 19
-      )
-      .sort((a, b) => b.score - a.score);
-    const first = scored[0];
-    // Never accept a match on city alone: a wrong pin would mislead customers.
-    if (!first || first.score < 7) {
-      return json({
-        error: 'Indirizzo non localizzato con sufficiente precisione. Imposta le coordinate manualmente nel backoffice.',
-      }, 422);
-    }
+    const { latitude, longitude, exactNumber } = outcome.match;
     const { error: saveError } = await db
       .from('properties')
       .update({
-        map_latitude: first.latitude,
-        map_longitude: first.longitude,
+        map_latitude: latitude,
+        map_longitude: longitude,
         map_geocoded_address: address,
       })
       .eq('id', property.id);
     if (saveError) throw saveError;
     return json({
-      latitude: first.latitude,
-      longitude: first.longitude,
+      latitude,
+      longitude,
       address,
-      provider: 'Photon / OpenStreetMap',
-      note: 'Verifica il punto sulla mappa, soprattutto per indirizzi senza numero civico.',
+      provider: outcome.provider,
+      note: exactNumber
+        ? 'Verifica il punto sulla mappa.'
+        : 'Numero civico non trovato: il punto indica la via. Verificalo sulla mappa e correggi le coordinate se necessario.',
     });
   } catch (error) {
-    if (error instanceof Error && error.name === 'TimeoutError') {
-      console.warn('Photon geocoding timed out after 15000ms');
-      return json({
-        error: 'Il servizio di geolocalizzazione non ha risposto entro 15 secondi. Riprova più tardi o inserisci le coordinate manualmente.',
-      }, 503);
-    }
     console.error('geocode-property failed:', error);
+    const message = (error as { message?: unknown } | null)?.message;
     return json({
-      error: error instanceof Error ? 'Geolocalizzazione fallita: ' + error.message : 'Geolocalizzazione fallita',
-    }, 503);
+      error: typeof message === 'string' ? 'Geolocalizzazione fallita: ' + message : 'Geolocalizzazione fallita',
+    }, 500);
   }
 });
