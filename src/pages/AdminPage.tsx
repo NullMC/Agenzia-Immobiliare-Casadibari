@@ -1172,7 +1172,12 @@ export default function AdminPage() {
                       required
                       value={propertyForm.city}
                       onChange={(e) =>
-                        setPropertyForm((current) => ({ ...current, city: e.target.value }))
+                        setPropertyForm((current) => ({
+                          ...current,
+                          city: e.target.value,
+                          map_latitude: '',
+                          map_longitude: '',
+                        }))
                       }
                     />
                   </label>
@@ -1181,7 +1186,12 @@ export default function AdminPage() {
                     <input
                       value={propertyForm.neighborhood}
                       onChange={(e) =>
-                        setPropertyForm((current) => ({ ...current, neighborhood: e.target.value }))
+                        setPropertyForm((current) => ({
+                          ...current,
+                          neighborhood: e.target.value,
+                          map_latitude: '',
+                          map_longitude: '',
+                        }))
                       }
                     />
                   </label>
@@ -1190,9 +1200,46 @@ export default function AdminPage() {
                     <input
                       value={propertyForm.address}
                       onChange={(e) =>
-                        setPropertyForm((current) => ({ ...current, address: e.target.value }))
+                        setPropertyForm((current) => ({
+                          ...current,
+                          address: e.target.value,
+                          map_latitude: '',
+                          map_longitude: '',
+                        }))
                       }
-                      placeholder="Indirizzo visualizzato nella scheda"
+                      placeholder="Es. Via Pasubio 78A"
+                    />
+                  </label>
+                  <div className="field field--wide admin-map-guidance">
+                    <strong>Posizione sulla mappa del catalogo</strong>
+                    <p>
+                      Il sistema cerca automaticamente la posizione dall’indirizzo quando
+                      salvi l’annuncio. Per un punto più preciso puoi inserire
+                      manualmente latitudine e longitudine da Google Maps.
+                    </p>
+                  </div>
+                  <label className="field">
+                    <span>Latitudine (facoltativa)</span>
+                    <input
+                      type="number"
+                      step="any"
+                      min="-90"
+                      max="90"
+                      value={propertyForm.map_latitude}
+                      onChange={(e) => setPropertyForm((current) => ({ ...current, map_latitude: e.target.value }))}
+                      placeholder="41.1171"
+                    />
+                  </label>
+                  <label className="field">
+                    <span>Longitudine (facoltativa)</span>
+                    <input
+                      type="number"
+                      step="any"
+                      min="-180"
+                      max="180"
+                      value={propertyForm.map_longitude}
+                      onChange={(e) => setPropertyForm((current) => ({ ...current, map_longitude: e.target.value }))}
+                      placeholder="16.8719"
                     />
                   </label>
                   <label className="field">
@@ -1391,6 +1438,73 @@ export default function AdminPage() {
                     Le immagini già caricate non vengono ricaricate.
                   </small>
                 </div>
+                <div className="admin-field-block admin-floorplan-editor">
+                  <span className="admin-field-label">Planimetria dell’immobile (opzionale)</span>
+                  <p className="admin-media-description">
+                    Carica un’immagine della planimetria. Apparirà separatamente dalla
+                    galleria fotografica, prima delle specifiche dell’annuncio.
+                  </p>
+                  <label className="upload-drop">
+                    <ImagePlus size={23} />
+                    <span>
+                      <strong>{floorPlanFile ? floorPlanFile.name : 'Seleziona o sostituisci la planimetria'}</strong>
+                      <small>JPEG, PNG, WEBP o AVIF · massimo 12 MB</small>
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      disabled={propertySaving}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        event.target.value = '';
+                        if (!file) return;
+                        if (
+                          !['image/jpeg','image/png','image/webp','image/avif'].includes(file.type) ||
+                          file.size > 12 * 1024 * 1024
+                        ) {
+                          setNotice('Planimetria non valida: scegli un’immagine JPEG, PNG, WEBP o AVIF entro 12 MB.');
+                          return;
+                        }
+                        setFloorPlanFile(file);
+                        setRemoveFloorPlan(false);
+                      }}
+                    />
+                  </label>
+                  {(floorPlanPreview ||
+                    (!removeFloorPlan &&
+                     properties.find((item) => item.id === editingId)?.floor_plan_url)) && (
+                    <div className="admin-floorplan-preview">
+                      <img
+                        src={
+                          floorPlanPreview ||
+                          properties.find((item) => item.id === editingId)?.floor_plan_url ||
+                          ''
+                        }
+                        alt="Anteprima della planimetria dell’immobile"
+                      />
+                      <span>{floorPlanFile ? 'Nuova planimetria da salvare' : 'Planimetria attuale'}</span>
+                    </div>
+                  )}
+                  {floorPlanFile && (
+                    <button
+                      type="button"
+                      className="admin-floorplan-remove"
+                      onClick={() => setFloorPlanFile(null)}
+                    >
+                      <X size={15} /> Annulla la nuova planimetria
+                    </button>
+                  )}
+                  {!floorPlanFile && properties.find((item) => item.id === editingId)?.floor_plan_url && (
+                    <label className="check-field admin-floorplan-remove">
+                      <input
+                        type="checkbox"
+                        checked={removeFloorPlan}
+                        onChange={(event) => setRemoveFloorPlan(event.target.checked)}
+                      />
+                      <span>Rimuovi la planimetria attuale al salvataggio</span>
+                    </label>
+                  )}
+                </div>
                 <div className="admin-publish-options">
                   <label className="check-field">
                     <input
@@ -1436,6 +1550,15 @@ export default function AdminPage() {
                 <div className="admin-table-heading">
                   <h3>Annunci presenti</h3>
                   <span>{properties.length} totali</span>
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    size="small"
+                    disabled={geolocating || propertySaving}
+                    onClick={() => void geolocateMissingProperties()}
+                  >
+                    {geolocating ? 'Geolocalizzazione in corso…' : 'Localizza indirizzi mancanti'}
+                  </Button>
                 </div>
                 {properties.length ? (
                   <div className="admin-listings-table">
