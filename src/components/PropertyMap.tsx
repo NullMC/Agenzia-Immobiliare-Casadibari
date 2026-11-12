@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ExternalLink, MapPin, Navigation, StreetView } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ExternalLink, MapPin, Navigation, Eye } from 'lucide-react';
 import type { Property } from '../types';
 import './property-map.css';
 
@@ -188,7 +188,7 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
                 />
               ) : (
                 <div className="listing-streetview__fallback">
-                  <StreetView size={48} />
+                  <Eye size={48} />
                   <h3>Esplora gli esterni con Street View</h3>
                   <p>
                     La visualizzazione panoramica integrata richiede
@@ -232,7 +232,7 @@ export default function PropertyMap({ properties }: { properties: Property[] }) 
                     className="listing-map-overlay__street"
                     onClick={() => { setStreetViewProperty(hovered); setHoveredId(null); }}
                   >
-                    <StreetView size={16} /> Esplora la strada
+                    <Eye size={16} /> Esplora la strada
                   </button>
                 </div>
               )}
