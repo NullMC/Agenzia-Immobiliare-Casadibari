@@ -5,6 +5,7 @@ import { Button, TextField } from '@mui/material';
 import Seo from '../components/Seo';
 import SearchBar from '../components/SearchBar';
 import PropertyCard from '../components/PropertyCard';
+import PropertyMap from '../components/PropertyMap';
 import { isSupabaseConfigured, supabase } from '../lib/supabase';
 import { type Property, type SearchFilters } from '../types';
 
@@ -181,6 +182,7 @@ export default function PropertiesPage() {
           </div>
         )}
       </section>
+      {!loading && <PropertyMap properties={filtered} />}
       <section className="alert-section">
         <div className="container alert-section__inner">
           <div className="alert-section__copy">
