@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from '@supabase/supabase-js';
 import type { Session } from '@supabase/supabase-js';
 import { Link } from 'react-router-dom';
 import {
@@ -157,6 +158,44 @@ function isPropertySlugConflict(error: { code?: string; message?: string; detail
     /properties_slug_key|\bslug\b/i.test([error.message, error.details].join(' '))
   );
 }
+/** Show the API's actual geocoding failure instead of hiding every non-2xx reply. */
+function geocodingResponseMessage(payload: unknown): string | null {
+  if (typeof payload !== 'object' || payload === null) return null;
+  const body = payload as Record<string, unknown>;
+  const message = typeof body.error === 'string' ? body.error :
+    typeof body.message === 'string' ? body.message : null;
+  return message?.trim() || null;
+}
+
+async function geocodingFailure(error: Error | null, payload: unknown): Promise<string | null> {
+  const payloadMessage = geocodingResponseMessage(payload);
+  if (payloadMessage) return payloadMessage;
+  if (!error) return null;
+
+  if (error instanceof FunctionsHttpError) {
+    const response = error.context;
+    try {
+      const bodyMessage = geocodingResponseMessage(await response.clone().json());
+      if (bodyMessage) return bodyMessage + ' (HTTP ' + response.status + ')';
+    } catch {
+      // Non-JSON platform responses still get an actionable status below.
+    }
+    switch (response.status) {
+      case 401: return 'Sessione non valida (HTTP 401). Rientra nel backoffice e verifica che la verifica JWT della funzione sia disattivata.';
+      case 403: return 'Accesso negato (HTTP 403). Verifica che il profilo amministratore sia attivo.';
+      case 404: return 'Risorsa non trovata (HTTP 404). Verifica il deploy di geocode-property sul progetto Casadibari.';
+      case 422: return 'Indirizzo non localizzato (HTTP 422). Controlla via, civico e città oppure inserisci le coordinate manualmente.';
+      case 500: return 'Errore del server (HTTP 500). Verifica i Secrets e i log della Edge Function.';
+      case 503: return 'Servizio temporaneamente non disponibile (HTTP 503). Verifica i log della Edge Function e il servizio di geolocalizzazione.';
+      default: return 'La Edge Function ha restituito HTTP ' + response.status + '. Controlla le sue invocazioni su Supabase.';
+    }
+  }
+  if (error instanceof FunctionsFetchError || error instanceof FunctionsRelayError) {
+    return 'Impossibile raggiungere la Edge Function. Verifica la rete, il deploy e i log di Supabase.';
+  }
+  return error.message || 'Errore sconosciuto durante la geolocalizzazione.';
+}
+
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString('it-IT', {
     day: '2-digit',
@@ -690,9 +729,9 @@ export default function AdminPage() {
       const { data, error } = await supabase.functions.invoke('geocode-property', {
         body: { property_id: propertyId },
       });
-      if (error || data?.error) {
-        geoNotice = ' Indirizzo non geolocalizzato: ' +
-          (data?.error || 'controlla la Edge Function geocode-property e le coordinate.');
+      const geocodingError = await geocodingFailure(error, data);
+      if (geocodingError) {
+        geoNotice = ' Indirizzo non geolocalizzato: ' + geocodingError;
       }
     } else if (!latitude && !propertyForm.address.trim()) {
       geoNotice = ' Aggiungi un indirizzo per visualizzare l’immobile sulla mappa.';
@@ -721,19 +760,24 @@ export default function AdminPage() {
     setGeolocating(true);
     let success = 0;
     let failed = 0;
+    let firstFailure = '';
     for (const property of pending) {
       const { data, error } = await supabase.functions.invoke('geocode-property', {
         body: { property_id: property.id },
       });
-      if (error || data?.error) failed += 1;
-      else success += 1;
+      const geocodingError = await geocodingFailure(error, data);
+      if (geocodingError) {
+        failed += 1;
+        if (!firstFailure) firstFailure = geocodingError;
+      } else success += 1;
       // Public Photon API requires reasonable usage; prevent rapid batch requests.
       await new Promise((resolve) => setTimeout(resolve, 1400));
     }
     await loadData();
     setGeolocating(false);
     setNotice('Geolocalizzazione: ' + success + ' immobili aggiornati, ' + failed +
-      ' da verificare. Per gli indirizzi non trovati imposta le coordinate manualmente.');
+      ' da verificare.' + (firstFailure ? ' Primo errore: ' + firstFailure + '.' : '') +
+      ' Per gli indirizzi non trovati imposta le coordinate manualmente.');
   };
 
   const deleteProperty = async (property: Property) => {
