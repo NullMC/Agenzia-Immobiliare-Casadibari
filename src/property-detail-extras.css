@@ -143,3 +143,36 @@
   .property-detail__overview.has-floor-plan .property-facts strong { font-size: 12px; }
   .property-detail__overview:not(.has-floor-plan) .property-facts { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
+
+/* Admin controls for optional floor plan and geocoding. */
+.admin-map-guidance {
+  border: 1px solid #daecdd;
+  background: #f5faf6;
+  border-radius: 10px;
+  padding: 12px 15px;
+}
+.admin-map-guidance strong { color: #247638; font-size: 12px; }
+.admin-map-guidance p { margin: 7px 0 0; color: #5b6e61; line-height: 1.6; font-size: 11px; }
+.admin-floorplan-preview {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid #dce9df;
+  border-radius: 11px;
+  background: #f8fcf9;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.admin-floorplan-preview img {
+  display: block;
+  max-width: min(340px, 100%);
+  max-height: 230px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid #e4ece6;
+  border-radius: 8px;
+}
+.admin-floorplan-preview span { color: #526e59; font-size: 12px; }
+.admin-floorplan-remove { display: inline-flex; align-items: center; gap: 8px; margin-top: 13px; color: #a03939; }
+.admin-floorplan-remove:not(label) { border: 0; background: transparent; cursor: pointer; font-size: 12px; padding: 4px 0; }
